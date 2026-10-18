@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Tarefas.Domain.Usuarios.Entities;
+
+namespace Tarefas.Application.Abstractions.Persistence;
+
+public interface IUsuarioRepository
+{
+    Task<Usuario?> ObterPorIdAsync(
+        Guid usuarioId, 
+        CancellationToken cancellationToken = default);
+
+    Task AdicionarAsync(
+        Usuario usuario, 
+        CancellationToken cancellationToken = default);
+
+    Task AtualizarAsync(
+        Usuario usuario, 
+        CancellationToken cancellationToken = default);
+}
+

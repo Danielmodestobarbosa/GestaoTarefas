@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tarefas.Domain.Common.Base;
+﻿using Tarefas.Domain.Common.Base;
 using Tarefas.Domain.Common.Eexceptions;
 using Tarefas.Domain.Common.Validations;
 using Tarefas.Domain.Tarefas.Enums;
@@ -11,7 +8,6 @@ namespace Tarefas.Domain.Tarefas.Entities;
 
 public sealed class Tarefa : AggregateRoot
 {
-    public Guid TarefaId { get; private set; }
     public string Titulo { get; private set; }
     public string Descricao { get; private set; }
     public DateTime? DataConclusao { get; private set; }
@@ -31,7 +27,7 @@ public sealed class Tarefa : AggregateRoot
         Status = StatusTarefa.Pendente;
 
         AddDomainEvent(new TarefaCriadaEvent(
-            TarefaId: TarefaId,
+            TarefaId: Id,
             Titulo: Titulo,
             Descricao: Descricao,
             Prioridade: Prioridade));
@@ -46,7 +42,7 @@ public sealed class Tarefa : AggregateRoot
         Status = StatusTarefa.EmAndamento;
 
         AddDomainEvent(new TarefaIniciadaEvent(
-            TarefaId: TarefaId));
+            TarefaId: Id));
 
         SetDataAtualizacao();
     }
@@ -64,7 +60,7 @@ public sealed class Tarefa : AggregateRoot
         DataConclusao = DateTime.UtcNow;
 
         AddDomainEvent(new TarefaConcluidaEvent(
-            TarefaId: TarefaId,
+            TarefaId: Id,
             DataConclusao: DataConclusao.Value));
 
         SetDataAtualizacao();
@@ -86,7 +82,7 @@ public sealed class Tarefa : AggregateRoot
         Prioridade = prioridade;
 
         AddDomainEvent(new TarefaAtualizadaEvent(
-            TarefaId: TarefaId,
+            TarefaId: Id,
             Titulo: Titulo,
             Prioridade: Prioridade));
 
@@ -105,7 +101,7 @@ public sealed class Tarefa : AggregateRoot
         Status = StatusTarefa.Cancelada;
 
         AddDomainEvent(new TarefaCanceladaEvent(
-            TarefaId: TarefaId));
+            TarefaId: Id));
 
         SetDataAtualizacao();
     }

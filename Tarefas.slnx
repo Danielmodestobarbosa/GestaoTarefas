@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="Tarefas.Application/Tarefas.Application.csproj" Id="81bb6d43-5486-48f4-8a4c-d94387bded01" />
     <Project Path="Tarefas.Domain/Tarefas.Domain.csproj" />
   </Folder>
   <Folder Name="/tests/">
