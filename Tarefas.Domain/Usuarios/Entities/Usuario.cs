@@ -74,6 +74,19 @@ public sealed class Usuario : AggregateRoot
 
         Status = StatusUsuario.Ativo;
 
+        AddDomainEvent(new UsuarioAtivadoEvent(
+            UsuarioId: Id));
+
+        SetDataAtualizacao();
+    }
+
+    public void ReativarUsuario()
+    {
+        if (Status == StatusUsuario.Ativo)
+            return;
+
+        Status = StatusUsuario.Ativo;
+
         AddDomainEvent(new UsuarioReativadoEvent(
             UsuarioId: Id));
 

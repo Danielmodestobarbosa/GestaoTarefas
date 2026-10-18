@@ -10,7 +10,6 @@
     <Folder Include="Tarefas\ValueObjects\" />
     <Folder Include="Usuarios\Entities\" />
     <Folder Include="Usuarios\Enums\" />
-    <Folder Include="Usuarios\Events\" />
     <Folder Include="Usuarios\ValueObjects\" />
   </ItemGroup>
 

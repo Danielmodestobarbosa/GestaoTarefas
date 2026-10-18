@@ -131,7 +131,7 @@ public class UsuarioTests
             .ContainSingle(u => u is UsuarioAtualizadoEvent);
     }
 
-    [Fact(DisplayName = "Deve atualizar DataAtualizacao")]
+    [Fact(DisplayName = "Deve atualizar DataAtualizacao ao atualizar usuário")]
     public void Deve_Atualizar_DataAtualizacao()
     {
         //Arrange
@@ -217,13 +217,267 @@ public class UsuarioTests
 
     #region Testes de Desativar usuário
 
+    [Fact(DisplayName = "Deve alterar status par inativo")]
+    public void Deve_Alterar_Status_Para_Inativo()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        //Act
+        usuario.DesativarPerfil();
+
+        //Assert
+        usuario.Status
+            .Should().Be(StatusUsuario.Inativo);
+
+    }
+
+    [Fact(DisplayName = "Deve registrar evento ao desativar usuário")]
+    public void Deve_Registrar_Evento_Ao_Desativar_Usuario()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        //Act
+        usuario.DesativarPerfil();
+
+        //Assert
+        usuario.DomainEvents
+            .Should()
+            .ContainSingle(u => u is UsuarioDesativadoEvent);
+    }
+
+    [Fact(DisplayName = "Deve atualizar DataAtualizacao ao desativar usuário")]
+    public void Deve_Atualizar_DataAtualizacao_Ao_Desativar_Usuario()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        //Act
+        usuario.DesativarPerfil();
+
+        //Assert
+        usuario.DataAtualizacao.Should().NotBeNull();
+    }
+
+    [Fact(DisplayName = "Não deve duplicar evento ao desativar novamente")]
+    public void Nao_Deve_Duplicar_Evento_Ao_Desativar_Usuario_Novamente()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        //Act
+        usuario.DesativarPerfil();
+        usuario.DesativarPerfil();
+
+        //Assert
+        usuario.DomainEvents
+            .Should()
+            .ContainSingle(u => u is UsuarioDesativadoEvent);
+    }
+
+    [Fact(DisplayName = "Deve manter a data de atualização ao desativar novamente")]
+    public void Deve_Manter_DataAtualizacao_Ao_Desativar_Usuario_Novamente()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        //Act
+        usuario.DesativarPerfil();
+
+        var dataAtualizacao = usuario.DataAtualizacao;
+
+        usuario.DesativarPerfil();
+
+        //Assert
+        usuario.DataAtualizacao.Should().Be(dataAtualizacao);
+    }
 
 
     #endregion
 
     #region Testes de Ativar usuário
 
+    [Fact(DisplayName = "Deve alterar status para ativo")]
+    public void Deve_Alterar_Status_Para_Ativo()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
 
+        var usuario = new Usuario(nome, email);
+
+        usuario.DesativarPerfil();
+
+        //Act
+        usuario.AtivarUsuario();
+
+        //Assert
+        usuario.Status
+            .Should()
+            .Be(StatusUsuario.Ativo);
+    }
+
+    [Fact(DisplayName = "Deve registrar evento ao ativar usuario")]
+    public void Deve_Registrar_Evento_Ao_Ativar_Usuario()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        usuario.DesativarPerfil();
+
+        //Act
+        usuario.AtivarUsuario();
+
+        //Assert
+        usuario.DomainEvents
+            .Should()
+            .ContainSingle(u => u is UsuarioAtivadoEvent);
+
+    }
+
+    [Fact(DisplayName = "Deve atualizar DataAtualizacao ao ativar usuário")]
+    public void Deve_Atualizar_DataAtualizacao_Ao_Ativar_Usuario()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        usuario.DesativarPerfil();
+
+        //Act
+        usuario.AtivarUsuario();
+        usuario.AtivarUsuario();
+
+        //Assert
+        usuario.DataAtualizacao.Should().NotBeNull();
+    }
+
+    [Fact(DisplayName = "Não deve duplicar evento ao ativar usuário novamente")]
+    public void Nao_Deve_Duplicar_Evento_Ao_Ativar_Usuario_Novamente()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        usuario.DesativarPerfil();
+
+        //Act
+        usuario.ReativarUsuario();
+        usuario.ReativarUsuario();
+
+        //Assert
+        usuario.DomainEvents
+            .Should()
+            .ContainSingle(u => u is UsuarioReativadoEvent);
+    }
+
+    [Fact(DisplayName = "Deve manter a data de atualização ao ativar usuário novamente")]
+    public void Deve_Manter_DataAtualizacao_Ao_Ativar_Usuario_Novamente()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        //Act
+        usuario.DesativarPerfil();
+
+        usuario.AtivarUsuario();
+
+        var dataAtualizacao = usuario.DataAtualizacao;
+
+        
+        usuario.AtivarUsuario();
+
+        //Assert
+        usuario.DataAtualizacao.Should().Be(dataAtualizacao);
+    }
+
+    #endregion
+
+    #region Testes de Reativação do Usuário
+
+    [Fact(DisplayName = "Deve reativar usuário inativo")]
+    public void Deve_Reativar_Usuario_Inativo()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        usuario.DesativarPerfil();
+
+        //Act
+        usuario.AtivarUsuario();
+
+        //Assert
+        usuario.Status.Should().Be(StatusUsuario.Ativo);
+    }
+
+    [Fact(DisplayName = "Deve registrar evento ao reativar usuário")]
+    public void Deve_Registrar_Evento_Ao_Reativar_Usuario()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        usuario.DesativarPerfil();
+
+        //Act
+        usuario.ReativarUsuario();
+
+        //Assert
+        usuario.Status
+            .Should()
+            .Be(StatusUsuario.Ativo);
+    }
+
+    [Fact(DisplayName = "Deve alterar evento ao reativar usuário")]
+    public void Deve_Alterar_Evento_Ao_Reativar_Usuario()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+
+        usuario.DesativarPerfil();
+
+        //Act
+        usuario.ReativarUsuario();
+
+        //Assert
+        usuario.DomainEvents
+            .Should()
+            .ContainSingle(u => u is UsuarioReativadoEvent);
+    }
 
     #endregion
 }
