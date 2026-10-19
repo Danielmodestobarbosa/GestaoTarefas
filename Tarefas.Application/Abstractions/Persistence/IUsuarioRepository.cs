@@ -7,7 +7,7 @@ namespace Tarefas.Application.Abstractions.Persistence;
 
 public interface IUsuarioRepository
 {
-    Task<Usuario?> ObterPorIdAsync(
+    Task<Usuario?> ObterUsuarioPorIdAsync(
         Guid usuarioId, 
         CancellationToken cancellationToken = default);
 

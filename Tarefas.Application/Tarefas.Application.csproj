@@ -11,8 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\TarefaCommands\AtualizarTarefa\" />
-    <Folder Include="Commands\TarefaCommands\IniciarTarefa\" />
     <Folder Include="Commands\TarefaCommands\ConcluirTarefa\" />
     <Folder Include="Commands\TarefaCommands\CancelarTarefa\" />
   </ItemGroup>

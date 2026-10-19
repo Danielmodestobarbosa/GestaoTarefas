@@ -7,7 +7,7 @@ namespace Tarefas.Application.Abstractions.Persistence;
 
 public interface ITarefaRepository
 {
-    Task<Tarefa?> ObterTarefaPorId(
+    Task<Tarefa?> ObterTarefaPorIdAsync(
         Guid tarefaId, 
         CancellationToken cancellationToken = default);
 
