@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tarefas.Application.Abstractions.Persistence;
+﻿using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Queries.Tarefas.DTOs;
 
 namespace Tarefas.Application.Queries.Tarefas.ObterTarefaPorIdQuery;

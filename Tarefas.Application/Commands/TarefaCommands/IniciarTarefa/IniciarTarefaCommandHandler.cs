@@ -38,7 +38,8 @@ public sealed class IniciarTarefaCommandHandler
         return new IniciarTarefaResultDto(
             tarefa.Id,
             tarefa.Titulo,
-            tarefa.Status);
+            tarefa.Status,
+            tarefa.Prioridade);
 
     }
 }

@@ -4,6 +4,7 @@
     <Project Path="Tarefas.Domain/Tarefas.Domain.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="Tarefas.Application.Tests/Tarefas.Application.Tests.csproj" Id="8e7fc108-70fc-47a2-b1bc-4b7c7d131745" />
     <Project Path="Tarefas.Domain.Tests/Tarefas.Domain.Tests.csproj" />
   </Folder>
 </Solution>
