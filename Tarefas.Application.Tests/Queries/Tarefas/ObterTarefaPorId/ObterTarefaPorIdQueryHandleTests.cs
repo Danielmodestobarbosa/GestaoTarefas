@@ -32,12 +32,30 @@ public sealed class ObterTarefaPorIdQueryHandlerTests
         //Assert
         resultado.Should().NotBeNull();
         resultado.Should().BeEquivalentTo(tarefaEsperada);
+    }
 
+    [Fact(DisplayName = "Deve retornar null quando a tarefa não for encontrado")]
+    public async Task Deve_Retornar_Null_Quando_Tarefa_Nao_For_Encontrada()
+    {
+        //Arrange
+        var tarefaId = Guid.NewGuid();
+
+        var repositorio = new FakeTarefaQueryRepository(null);
+        var handler = new ObterTarefaPorIdQueryHandler(repositorio);
+        var query = new ObterTarefaPorIdQuery(tarefaId);
+
+        //Act
+        var resultado = await handler.HandleAsync(query);
+
+        //Assert
+        resultado.Should().BeNull();
     }
 }
 
 internal sealed class FakeTarefaQueryRepository : ITarefaQueryRepository
 {
+    public Guid? UltimoIdConsultado { get; private set; }
+
     private readonly ObterTarefaPorIdResultDto? _tarefa;
 
     public FakeTarefaQueryRepository(ObterTarefaPorIdResultDto? tarefa)
@@ -49,6 +67,8 @@ internal sealed class FakeTarefaQueryRepository : ITarefaQueryRepository
         Guid tarefaId,
         CancellationToken ct = default)
     {
+        UltimoIdConsultado = tarefaId;
+
         return Task.FromResult(_tarefa);
     }
 

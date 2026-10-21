@@ -6,5 +6,6 @@ namespace Tarefas.Application.Queries.Tarefas.ListarTarefas;
 
 public sealed class ListarTarefasQuery
 {
+
 }
 
