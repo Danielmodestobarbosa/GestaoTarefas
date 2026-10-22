@@ -50,7 +50,27 @@ public sealed class ObterTarefaPorIdQueryHandlerTests
         //Assert
         resultado.Should().BeNull();
     }
+
+    [Fact(DisplayName = "Deve consultar o repositório com o Id informado")]
+    public async Task Deve_Consultar_Repositorio_Com_Id_Informado()
+    {
+        //Arrange
+        var tarefaId = Guid.NewGuid();
+
+        var repositorio = new FakeTarefaQueryRepository(null);
+        var handler = new ObterTarefaPorIdQueryHandler(repositorio);
+        var query = new ObterTarefaPorIdQuery(tarefaId);
+
+        //Act 
+        await handler.HandleAsync(query);
+
+        //Assert
+        repositorio.UltimoIdConsultado.Should().Be(tarefaId);
+
+    }
 }
+
+
 
 internal sealed class FakeTarefaQueryRepository : ITarefaQueryRepository
 {

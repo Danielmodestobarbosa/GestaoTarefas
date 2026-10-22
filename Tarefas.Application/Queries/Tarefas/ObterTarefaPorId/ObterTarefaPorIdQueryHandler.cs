@@ -10,8 +10,11 @@ public sealed class ObterTarefaPorIdQueryHandler
     public ObterTarefaPorIdQueryHandler(
         ITarefaQueryRepository queryRepo) => _queryRepo = queryRepo;
 
-    public async Task<ObterTarefaPorIdResultDto?> HandleAsync(
+    public Task<ObterTarefaPorIdResultDto?> HandleAsync(
         ObterTarefaPorIdQuery query,
-        CancellationToken ct = default) => await _queryRepo.ObterPorIdAsync(query.TarefaId, ct); 
+        CancellationToken ct = default)
+    {
+        return _queryRepo.ObterPorIdAsync(query.TarefaId, ct);
+    }
 }
 
