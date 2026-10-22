@@ -593,5 +593,108 @@ public class TarefasTests
     }
 
     #endregion
+
+    #region Teste de AtribuirUsuario
+
+    [Fact(DisplayName = "Deve atribuir um usuario válido a tarefa")]
+    public void Deve_Atribuir_Usuario_Valido_A_Tarefa()
+    {
+        //Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        var usuarioId = Guid.NewGuid();
+
+        //Act
+        tarefa.AtribuirUsuario(usuarioId);
+
+        //Assert
+        tarefa.UsuarioId.Should().Be(usuarioId);
+
+    }
+
+    [Fact(DisplayName = "Não deve permitir atribuir com ID inválido")]
+    public void Nao_Deve_Atribuir_Usuario_Com_Id_Invalido()
+    {
+        //Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        //Act
+        var acao = () => tarefa.AtribuirUsuario(Guid.Empty);
+
+        //Assert
+        acao.Should().
+            Throw<DomainException>()
+            .WithMessage("O ID do usuário é inválido");
+    }
+
+    [Fact(DisplayName = "Deve atualizar a data ao atribuir usuario")]
+    public void Deve_Atribuir_Data_Ao_Atribuir_Usuario()
+    {
+        //Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        var usuarioId = Guid.NewGuid();
+
+        //Act
+        tarefa.AtribuirUsuario(usuarioId);
+
+        //Assert
+        tarefa.DataAtualizacao.Should().NotBeNull();
+    }
+
+    [Fact(DisplayName = "Deve permitir reatribuir uma tarefa a outro usuário")]
+    public void Deve_Permitir_Reatribuir_Tarefa_Para_Outro_Usuario()
+    {
+        //Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        var primeiroUsuáioId = Guid.NewGuid();
+        var segundoUsuarioId = Guid.NewGuid();
+ 
+        tarefa.AtribuirUsuario(primeiroUsuáioId);
+
+        //Act
+        tarefa.AtribuirUsuario(segundoUsuarioId);
+
+        //Assert
+        tarefa.UsuarioId.Should().Be(segundoUsuarioId);
+    }
+
+    [Fact(DisplayName = "Não deve permitir substituir o usuário quando o novo ID é inválido")]
+    public void Nao_Deve_Permitir_Atribuir_Outro_Usuario_Se_Id_For_Inválido()
+    {
+        //Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        var primeiroUsuáioId = Guid.NewGuid();
+
+        tarefa.AtribuirUsuario(primeiroUsuáioId);
+
+        //Act
+        var acao = () => tarefa.AtribuirUsuario(Guid.Empty);
+
+        //Assert
+        acao.Should().
+            Throw<DomainException>();
+
+        tarefa.UsuarioId.Should().Be(primeiroUsuáioId);
+    }
+
+    #endregion
 }
 

@@ -13,6 +13,7 @@ public sealed class Tarefa : AggregateRoot
     public DateTime? DataConclusao { get; private set; }
     public StatusTarefa Status { get; private set; }
     public PrioridadeTarefa Prioridade { get; private set; }
+    public Guid? UsuarioId { get; private set; }
 
     public Tarefa(
         string titulo,
@@ -102,6 +103,17 @@ public sealed class Tarefa : AggregateRoot
 
         AddDomainEvent(new TarefaCanceladaEvent(
             TarefaId: Id));
+
+        SetDataAtualizacao();
+    }
+
+    public void AtribuirUsuario(Guid usuarrioId)
+    {
+        Guard.Against<DomainException>(
+            usuarrioId == Guid.Empty,
+            "O ID do usuário é inválido");
+
+        UsuarioId = usuarrioId;
 
         SetDataAtualizacao();
     }
