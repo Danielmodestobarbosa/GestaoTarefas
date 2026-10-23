@@ -681,9 +681,9 @@ public class TarefasTests
             "Estudar testes unitários",
             PrioridadeTarefa.Alta);
 
-        var primeiroUsuáioId = Guid.NewGuid();
+        var primeiroUsuarioId = Guid.NewGuid();
 
-        tarefa.AtribuirUsuario(primeiroUsuáioId);
+        tarefa.AtribuirUsuario(primeiroUsuarioId);
 
         //Act
         var acao = () => tarefa.AtribuirUsuario(Guid.Empty);
@@ -692,7 +692,55 @@ public class TarefasTests
         acao.Should().
             Throw<DomainException>();
 
-        tarefa.UsuarioId.Should().Be(primeiroUsuáioId);
+        tarefa.UsuarioId.Should().Be(primeiroUsuarioId);
+    }
+
+    [Fact(DisplayName = "Não atribui usuário a tarefa cancelada")]
+    public void Nao_Deve_Atribuir_Usuario_A_Tarefa_Cancelada()
+    {
+        //Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        tarefa.Cancelar();
+
+        var usuarioId = Guid.NewGuid();
+
+        //Act
+        var acao = () => tarefa.AtribuirUsuario(usuarioId);
+
+        //Assert
+        acao.Should()
+            .Throw<DomainException>()
+            .WithMessage("Não é possível atribuir um usuário a uma tarefa concluída ou cancelada");
+
+        tarefa.UsuarioId.Should().NotBe(usuarioId);
+    }
+
+    [Fact(DisplayName = "Não atribui usuário a tarefa concluída")]
+    public void Nao_Deve_Atribuir_Usuario_A_Tarefa_Concluída()
+    {
+        //Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        tarefa.Concluir();
+
+        var usuarioId = Guid.NewGuid();
+
+        //Act
+        var acao = () => tarefa.AtribuirUsuario(usuarioId);
+
+        //Assert
+        acao.Should()
+            .Throw<DomainException>()
+            .WithMessage("Não é possível atribuir um usuário a uma tarefa concluída ou cancelada");
+
+        tarefa.UsuarioId.Should().NotBe(usuarioId);
     }
 
     #endregion

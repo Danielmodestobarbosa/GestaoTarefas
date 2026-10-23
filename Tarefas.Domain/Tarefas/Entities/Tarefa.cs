@@ -107,13 +107,18 @@ public sealed class Tarefa : AggregateRoot
         SetDataAtualizacao();
     }
 
-    public void AtribuirUsuario(Guid usuarrioId)
+    public void AtribuirUsuario(Guid usuarioId)
     {
         Guard.Against<DomainException>(
-            usuarrioId == Guid.Empty,
+            usuarioId == Guid.Empty,
             "O ID do usuário é inválido");
 
-        UsuarioId = usuarrioId;
+        Guard.Against<DomainException>(
+            Status != StatusTarefa.Pendente &&
+            Status != StatusTarefa.EmAndamento,
+            "Não é possível atribuir um usuário a uma tarefa concluída ou cancelada");
+
+        UsuarioId = usuarioId;
 
         SetDataAtualizacao();
     }
