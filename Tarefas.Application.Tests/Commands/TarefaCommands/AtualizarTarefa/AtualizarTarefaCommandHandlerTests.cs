@@ -1,7 +1,4 @@
 ﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
 using Tarefas.Domain.Tarefas.Entities;
@@ -107,6 +104,71 @@ public sealed class AtualizarTarefaCommandHandlerTests
             .WithMessage("Falha simulada ao atualizar tarefa");
     }
 
+    [Fact(DisplayName = "Deve propagar exceção quando a consulta falhar")]
+    public async Task Deve_Propagar_Excecao_Quando_Consulta_Falhar()
+    {
+        // Arrange
+        var tarefa = new Tarefa(
+            "Título antigo",
+            "Descrição antiga",
+            PrioridadeTarefa.Baixa);
+
+        var repositorio = new FakeTarefaRepository(tarefa)
+        {
+            DeveFalharAoConsultar = true
+        };
+
+        var handler = new AtualizarTarefaCommandHandler(repositorio);
+
+        var command = new AtualizarTarefaCommand(
+            tarefa.Id,
+            "Novo título",
+            "Nova descrição",
+            PrioridadeTarefa.Alta);
+
+        // Act
+        var act = async () => await handler.HandleAsync(command);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage("Falha simulada ao consultar tarefa");
+
+        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+    }
+
+    [Fact(DisplayName = "Deve encaminhar o CancellationToken ao repositório")]
+    public async Task Deve_Encaminhar_CancellationToken_Ao_Repositorio()
+    {
+        // Arrange
+        var tarefa = new Tarefa(
+            "Título antigo",
+            "Descrição antiga",
+            PrioridadeTarefa.Alta);
+
+        var repositorio = new FakeTarefaRepository(tarefa);
+        var handler = new AtualizarTarefaCommandHandler(repositorio);
+
+        var command = new AtualizarTarefaCommand(
+            tarefa.Id,
+            "Novo título",
+            "Nova descrição",
+            PrioridadeTarefa.Media);
+
+        using var cts = new CancellationTokenSource();
+        var cancellationToken = cts.Token;
+
+        // Act
+        await handler.HandleAsync(command, cancellationToken);
+
+        // Assert
+        repositorio.UltimoTokenConsulta.Should()
+            .Be(cancellationToken);
+
+        repositorio.UltimoTokenAtualizacao.Should()
+            .Be(cancellationToken);
+    }
+
 
     #endregion
 }
@@ -116,18 +178,28 @@ internal class FakeTarefaRepository : ITarefaRepository
     private readonly Tarefa _tarefa;
 
     public bool DeveFalharAoAtualizar { get; set; }
+    public bool DeveFalharAoConsultar { get; set; }
+    public CancellationToken UltimoTokenConsulta { get; private set; }
+    public CancellationToken UltimoTokenAtualizacao { get; private set; }
+    public int QuantidadeDeAtualizacoes { get; private set; }
 
     public FakeTarefaRepository(Tarefa tarefa)
     {
         _tarefa = tarefa;
     }
 
-    public int QuantidadeDeAtualizacoes { get; private set; }
-
     public Task<Tarefa?> ObterTarefaPorIdAsync(
-    Guid tarefaId, CancellationToken
-    cancellationToken = default)
+        Guid tarefaId, CancellationToken
+        cancellationToken = default)
     {
+        UltimoTokenConsulta = cancellationToken;
+
+        if (DeveFalharAoConsultar)
+        {
+            throw new InvalidOperationException(
+                "Falha simulada ao consultar tarefa");
+        }
+
         return Task.FromResult<Tarefa?>(
             tarefaId == _tarefa.Id ? _tarefa : null);
     }
@@ -143,6 +215,8 @@ internal class FakeTarefaRepository : ITarefaRepository
         Tarefa tarefa, 
         CancellationToken cancellationToken = default)
     {
+        UltimoTokenAtualizacao = cancellationToken;
+
         if (DeveFalharAoAtualizar)
         {
             throw new InvalidOperationException(
