@@ -169,6 +169,31 @@ public sealed class AtualizarTarefaCommandHandlerTests
             .Be(cancellationToken);
     }
 
+    
+    [Fact(DisplayName = "Deve consultar usando o ID correto da tarefa")]
+    public async Task Deve_Consultar_Usando_Id_Correto_Da_Tarefa()
+    {
+        // Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        var repositorio = new FakeTarefaRepository(tarefa);
+        var handler = new AtualizarTarefaCommandHandler(repositorio);
+
+        var command = new AtualizarTarefaCommand(
+            tarefa.Id,
+            "Novo título",
+            "Nova descrição",
+            PrioridadeTarefa.Media);
+
+        // Act
+        await handler.HandleAsync(command);
+
+        // Assert
+        repositorio.UltimoIdConsultado.Should().Be(tarefa.Id);
+    }
 
     #endregion
 }
@@ -182,6 +207,7 @@ internal class FakeTarefaRepository : ITarefaRepository
     public CancellationToken UltimoTokenConsulta { get; private set; }
     public CancellationToken UltimoTokenAtualizacao { get; private set; }
     public int QuantidadeDeAtualizacoes { get; private set; }
+    public Guid UltimoIdConsultado { get; private set; }
 
     public FakeTarefaRepository(Tarefa tarefa)
     {
@@ -193,6 +219,8 @@ internal class FakeTarefaRepository : ITarefaRepository
         cancellationToken = default)
     {
         UltimoTokenConsulta = cancellationToken;
+
+        UltimoIdConsultado = tarefaId;
 
         if (DeveFalharAoConsultar)
         {

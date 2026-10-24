@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tarefas.Application.Abstractions.Persistence;
+﻿using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Domain.Tarefas.Entities;
 
 namespace Tarefas.Application.Commands.TarefaCommands.CriarTarefa;

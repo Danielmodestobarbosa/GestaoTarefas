@@ -14,6 +14,8 @@ namespace Tarefas.Application.Tests.Commands.TarefaCommands.AtribuirUsuarioTaref
 
 public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 {
+    #region Teste de Atribuição de usuário
+
     [Fact(DisplayName = "Deve atribuir um usuário quando tarefa e usuario existirem e usuario estiver ativo")]
     public async Task Deve_Atribuir_Usuario_Quando_Tarefa_Usuario_Existirem_E_Usuario_Ativo()
     {
@@ -233,6 +235,8 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         tarefaRepository.QuantidadeDeAtualizacoes.Should().Be(1);
     }
+
+    #endregion
 
 }
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tarefas.Domain.Tarefas.Enums;
+﻿using Tarefas.Domain.Tarefas.Enums;
 
 namespace Tarefas.Application.Commands.TarefaCommands.CriarTarefa;
 
@@ -20,7 +17,5 @@ public sealed class CriarTarefaCommand
         Descricao = descricao;
         Prioridade = prioridade;
     }
-
-
 }
 
