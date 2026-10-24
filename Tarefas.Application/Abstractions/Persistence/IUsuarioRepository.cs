@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tarefas.Domain.Usuarios.Entities;
+﻿using Tarefas.Domain.Usuarios.Entities;
 
 namespace Tarefas.Application.Abstractions.Persistence;
 

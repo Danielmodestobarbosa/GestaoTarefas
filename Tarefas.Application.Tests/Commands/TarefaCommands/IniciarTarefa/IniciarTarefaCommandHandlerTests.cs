@@ -166,6 +166,8 @@ public sealed class IniciarTarefaCommandHandlerTests
         // Assert
         repositorio.UltimoIdConsultado.Should().Be(tarefa.Id);
     }
+
+
 }
 
 internal sealed class FakeTarefaRepository : ITarefaRepository
