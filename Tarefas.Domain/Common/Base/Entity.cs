@@ -18,7 +18,7 @@ namespace Tarefas.Domain.Common.Base
         //e não instanciadas de forma simples
         protected Entity()
         {
-            //Atribui um novo Guid no momento da criação
+            //Atribui um novo Guid no momento da criação  
             Id = Guid.NewGuid();
             DataCriacao = DateTime.UtcNow;
         }
@@ -39,7 +39,7 @@ namespace Tarefas.Domain.Common.Base
             if (obj is not Entity other) return false;
 
             //Estou comparando um objeto com ele mesmo, se sim retorna true
-            if(ReferenceEquals(this, other)) return true;
+            if(ReferenceEquals(this, other)) return true; 
 
             //Se o Id ainda não foi persistido (é Guid.Empty), compara por referência
             return Id.Equals(other.Id);
@@ -79,13 +79,13 @@ namespace Tarefas.Domain.Common.Base
         }
 
         //Método protegido para remover um evento de domínio
-        protected void RemoveDomainEvent(IDomainEvent domainEvent)
+        public void RemoveDomainEvent(IDomainEvent domainEvent)
         {
             _domainEvents.Remove(domainEvent);
         }
 
         //Método protegido para limpar todos os eventos de domínio
-        protected void ClearDomainEvents()
+        public void ClearDomainEvents()
         {
             _domainEvents.Clear();
         }
