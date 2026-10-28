@@ -11,7 +11,9 @@ public sealed class AtribuirUsuarioTarefaCommandHandler
     private readonly ITarefaRepository _tarefaRepository;
     private readonly IUsuarioRepository _usuarioRepository;
 
-    public AtribuirUsuarioTarefaCommandHandler(ITarefaRepository tarefaRepository, IUsuarioRepository usuarioRepository)
+    public AtribuirUsuarioTarefaCommandHandler(
+        ITarefaRepository tarefaRepository, 
+        IUsuarioRepository usuarioRepository)
     {
         _tarefaRepository = tarefaRepository;
         _usuarioRepository = usuarioRepository;

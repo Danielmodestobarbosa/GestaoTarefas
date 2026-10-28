@@ -27,7 +27,7 @@ public sealed class ObterTarefaPorIdQueryHandlerTests
         var query = new ObterTarefaPorIdQuery(tarefaId);
 
         //Act
-        var resultado = await handler.HandleAsync(query);
+        var resultado = await handler.Handle(query, CancellationToken.None);
 
         //Assert
         resultado.Should().NotBeNull();
@@ -45,7 +45,7 @@ public sealed class ObterTarefaPorIdQueryHandlerTests
         var query = new ObterTarefaPorIdQuery(tarefaId);
 
         //Act
-        var resultado = await handler.HandleAsync(query);
+        var resultado = await handler.Handle(query, CancellationToken.None);
 
         //Assert
         resultado.Should().BeNull();
@@ -62,7 +62,7 @@ public sealed class ObterTarefaPorIdQueryHandlerTests
         var query = new ObterTarefaPorIdQuery(tarefaId);
 
         //Act 
-        await handler.HandleAsync(query);
+        await handler.Handle(query, CancellationToken.None);
 
         //Assert
         repositorio.UltimoIdConsultado.Should().Be(tarefaId);

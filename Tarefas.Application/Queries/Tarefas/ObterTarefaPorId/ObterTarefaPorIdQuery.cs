@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using Tarefas.Application.Queries.Tarefas.DTOs;
 
 namespace Tarefas.Application.Queries.Tarefas.ObterTarefaPorIdQuery;
 
 public sealed class ObterTarefaPorIdQuery
+    : IRequest<ObterTarefaPorIdResultDto?>
 {
     public Guid TarefaId { get; }
 
@@ -16,4 +16,3 @@ public sealed class ObterTarefaPorIdQuery
         TarefaId = tarefaId;
     }
 }
-

@@ -1,18 +1,17 @@
-﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
+using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Queries.Tarefas.DTOs;
 using Tarefas.Application.Queries.Tarefas.ListarTarefas;
 
 namespace Tarefas.Application.Tests.Queries.Tarefas.ListarTarefas;
+
 public sealed class ListarTarefaQueryHandlerTests
 {
     [Fact(DisplayName = "Deve retornar a lista de tarefas")]
     public async Task Deve_Retornar_Lista_De_Tarefas()
     {
-        //Arrange
+        // Arrange
         IReadOnlyList<TarefaResumoDto> tarefasEsperadas =
         [
             new TarefaResumoDto
@@ -31,14 +30,14 @@ public sealed class ListarTarefaQueryHandlerTests
             }
         ];
 
-        //Act
         var repositorio = new FakeTarefaRepository(tarefasEsperadas);
         var handler = new ListarTarefasQueryHandler(repositorio);
         var query = new ListarTarefasQuery();
 
-        var resultado = await handler.HandleAsync(query);
+        // Act
+        var resultado = await handler.Handle(query, CancellationToken.None);
 
-        //Assert
+        // Assert
         resultado.Should().NotBeNull();
         resultado.Should().HaveCount(2);
         resultado.Should().BeEquivalentTo(tarefasEsperadas);
@@ -47,17 +46,17 @@ public sealed class ListarTarefaQueryHandlerTests
     [Fact(DisplayName = "Deve retornar lista vazia quando não houver tarefas")]
     public async Task Deve_Retornar_Lista_Vazia_Quando_Nao_Houver_Tarefas()
     {
-        //Arrange
+        // Arrange
         IReadOnlyList<TarefaResumoDto> tarefas = [];
 
         var repositorio = new FakeTarefaRepository(tarefas);
         var handler = new ListarTarefasQueryHandler(repositorio);
         var query = new ListarTarefasQuery();
 
-        //Act
-        var resultado = await handler.HandleAsync(query);
+        // Act
+        var resultado = await handler.Handle(query, CancellationToken.None);
 
-        //Assert
+        // Assert
         resultado.Should().NotBeNull();
         resultado.Should().BeEmpty();
     }
@@ -65,39 +64,41 @@ public sealed class ListarTarefaQueryHandlerTests
     [Fact(DisplayName = "Deve consultar o repositorio uma única vez")]
     public async Task Deve_Consultar_Repositorio_Uma_Unica_Vez()
     {
-        //Arrange
+        // Arrange
         IReadOnlyList<TarefaResumoDto> tarefas = [];
 
         var repositorio = new FakeTarefaRepository(tarefas);
         var handler = new ListarTarefasQueryHandler(repositorio);
         var query = new ListarTarefasQuery();
 
-        //Act
-         await handler.HandleAsync(query);
+        // Act
+        await handler.Handle(query, CancellationToken.None);
 
-        //Assert
+        // Assert
         repositorio.QuantidadeDeConsultas.Should().Be(1);
     }
 
     [Fact(DisplayName = "Deve encaminhar o CancellationToken ao repositorio")]
     public async Task Deve_Encaminhar_CancellationToken_Ao_Repositorio()
     {
-        //Arrange
+        // Arrange
         IReadOnlyList<TarefaResumoDto> tarefas = [];
 
         var repositorio = new FakeTarefaRepository(tarefas);
         var handler = new ListarTarefasQueryHandler(repositorio);
         var query = new ListarTarefasQuery();
+
         using var cts = new CancellationTokenSource();
         var token = cts.Token;
 
-        //Act
-        await handler.HandleAsync(query, token);
+        // Act
+        await handler.Handle(query, token);
 
-        //Assert
+        // Assert
         repositorio.UltimoTokenRecebido.Should().Be(token);
     }
 }
+
 
 
 internal sealed class FakeTarefaRepository : ITarefaQueryRepository

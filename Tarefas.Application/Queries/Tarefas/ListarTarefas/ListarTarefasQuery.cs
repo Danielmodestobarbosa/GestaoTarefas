@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
+using MediatR;
+using Tarefas.Application.Queries.Tarefas.DTOs;
 
 namespace Tarefas.Application.Queries.Tarefas.ListarTarefas;
 
-public sealed class ListarTarefasQuery
-{
-
-}
-
+public sealed record ListarTarefasQuery
+    : IRequest<IReadOnlyList<TarefaResumoDto>>;
