@@ -17,6 +17,13 @@ public sealed class Usuario : AggregateRoot
     public Email Email { get; private set; }
     public StatusUsuario Status { get; private set; }
 
+    // Construtor utilizado pelo Entity Framework Core.
+    private Usuario()
+    {
+        Nome = null!;
+        Email = null!;
+    }
+
     public Usuario(
         NomeUsuario nome,
         Email email)

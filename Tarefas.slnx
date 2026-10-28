@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="Tarefas.Api/Tarefas.Api.csproj" Id="c14f410c-8f02-40c9-9495-62da7d6287ad" />
     <Project Path="Tarefas.Application/Tarefas.Application.csproj" Id="81bb6d43-5486-48f4-8a4c-d94387bded01" />
     <Project Path="Tarefas.Domain/Tarefas.Domain.csproj" />
     <Project Path="Tarefas.Infraestructure/Tarefas.Infraestructure.csproj" Id="87aad8ec-df7c-4199-9016-c3f4829a44b3" />

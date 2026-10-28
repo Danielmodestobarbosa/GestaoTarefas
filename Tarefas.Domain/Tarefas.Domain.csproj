@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Tarefas\ValueObjects\" />
+    <Folder Include="Tarefas\Integration\" />
     <Folder Include="Usuarios\Entities\" />
     <Folder Include="Usuarios\Enums\" />
     <Folder Include="Usuarios\ValueObjects\" />

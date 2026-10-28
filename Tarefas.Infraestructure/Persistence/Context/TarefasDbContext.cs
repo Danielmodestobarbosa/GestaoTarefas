@@ -32,12 +32,12 @@ public sealed class TarefasDbContext : DbContext
             .SelectMany(e => e.Entity.DomainEvents)
             .ToList();
 
-        // 2. Limpa os eventos para evitar que sejam despachados novamente.
+        // 2. Persiste as alterações no banco.
+        var result = await base.SaveChangesAsync(ct);
+
+        // 3. Limpa os eventos para evitar que sejam despachados novamente.
         foreach (var entry in ChangeTracker.Entries<Entity>())
             entry.Entity.ClearDomainEvents();
-
-        // 3. Persiste as alterações no banco.
-        var result = await base.SaveChangesAsync(ct);
 
         // 4. Despacha os eventos somente após salvar com sucesso.
         if (eventos.Any())
