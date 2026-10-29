@@ -1,9 +1,12 @@
-﻿using Tarefas.Application.Abstractions.Persistence;
+﻿
+using MediatR;
+using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Domain.Tarefas.Entities;
 
 namespace Tarefas.Application.Commands.TarefaCommands.CriarTarefa;
 
 public sealed class CriarTarefaCommandHandler
+    : IRequestHandler<CriarTarefaCommand, CriarTarefaResultDto>
 {
     private readonly ITarefaRepository _tarefaRepository;
 
@@ -12,14 +15,14 @@ public sealed class CriarTarefaCommandHandler
         _tarefaRepository = tarefaRepository;
     }
 
-    public async Task<CriarTarefaResultDto> HandleAsync(
-        CriarTarefaCommand command, 
-        CancellationToken cancellationToken = default)
+    public async Task<CriarTarefaResultDto> Handle(
+        CriarTarefaCommand request,
+        CancellationToken cancellationToken)
     {
         var tarefa = new Tarefa(
-            command.Titulo,
-            command.Descricao,
-            command.Prioridade);
+            request.Titulo,
+            request.Descricao,
+            request.Prioridade);
 
         await _tarefaRepository.AdicionarAsync(
             tarefa,
@@ -32,4 +35,3 @@ public sealed class CriarTarefaCommandHandler
             tarefa.Prioridade);
     }
 }
-

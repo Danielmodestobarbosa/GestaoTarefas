@@ -26,7 +26,7 @@ public sealed class CriarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         // Act
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command, CancellationToken.None);
 
         // Assert
         resultado.TarefaId.Should().NotBeEmpty();
@@ -56,7 +56,7 @@ public sealed class CriarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         // Act
-        var act = async () => await handler.HandleAsync(command);
+        var act = async () => await handler.Handle(command, CancellationToken.None);
 
         // Assert
         await act.Should()
@@ -82,7 +82,7 @@ public sealed class CriarTarefaCommandHandlerTests
         var cancellationToken = cts.Token;
 
         // Act
-        await handler.HandleAsync(command, cancellationToken);
+        await handler.Handle(command, cancellationToken);
 
         // Assert
         repositorio.UltimoTokenAdicao.Should()
