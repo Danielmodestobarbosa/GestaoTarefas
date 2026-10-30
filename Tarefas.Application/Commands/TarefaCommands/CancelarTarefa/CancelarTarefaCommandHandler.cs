@@ -1,8 +1,10 @@
-﻿using Tarefas.Application.Abstractions.Persistence;
+﻿using MediatR;
+using Tarefas.Application.Abstractions.Persistence;
 
 namespace Tarefas.Application.Commands.TarefaCommands.CancelarTarefa;
 
-public sealed class CancelarTarefaCommandHandler
+public sealed class CancelarTarefaCommandHandler : 
+    IRequestHandler<CancelarTarefaCommand, CancelarTarefaResultDto>
 {
     private readonly ITarefaRepository _tarefaRepository;
 
@@ -11,12 +13,12 @@ public sealed class CancelarTarefaCommandHandler
         _tarefaRepository = tarefaRepository;
     }
 
-    public async Task<CancelarTarefaResultDto> HandleAsync (
-        CancelarTarefaCommand command, 
+    public async Task<CancelarTarefaResultDto> Handle (
+        CancelarTarefaCommand request, 
         CancellationToken cancellationToken = default)
     {
         var tarefa = await _tarefaRepository.ObterTarefaPorIdAsync(
-            command.TarefaId,
+            request.TarefaId,
             cancellationToken);
 
         if(tarefa is null)

@@ -1,9 +1,11 @@
-﻿using Tarefas.Application.Abstractions.Persistence;
+﻿using MediatR;
+using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Domain.Usuarios.Entities;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.CriarUsuario;
 
-public sealed class CriarUsuarioCommandHandler
+public sealed class CriarUsuarioCommandHandler 
+    : IRequestHandler<CriarUsuarioCommand, CriarUsuarioResultDto>
 {
     private readonly IUsuarioRepository _usuarioRepository;
 
@@ -12,13 +14,13 @@ public sealed class CriarUsuarioCommandHandler
         _usuarioRepository = usuarioRepository;
     }
 
-    public async Task<CriarUsuarioResultDto> HandleAsync(
-        CriarUsuarioCommand command, 
+    public async Task<CriarUsuarioResultDto> Handle(
+        CriarUsuarioCommand request, 
         CancellationToken cancellationToken = default)
     {
         var usuario = new Usuario(
-            command.Nome,
-            command.Email);
+            request.Nome,
+            request.Email);
 
         await _usuarioRepository.AdicionarAsync(
             usuario,

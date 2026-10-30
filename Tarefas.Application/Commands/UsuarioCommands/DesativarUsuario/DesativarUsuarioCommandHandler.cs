@@ -1,8 +1,10 @@
-﻿using Tarefas.Application.Abstractions.Persistence;
+﻿using MediatR;
+using Tarefas.Application.Abstractions.Persistence;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.DesativarUsuario;
 
-public sealed class DesativarUsuarioCommandHandler
+public sealed class DesativarUsuarioCommandHandler 
+    : IRequestHandler<DesativarUsuarioCommand, DesativarUsuarioResultDto>
 {
     private readonly IUsuarioRepository _usuarioRepository;
 
@@ -11,12 +13,12 @@ public sealed class DesativarUsuarioCommandHandler
         this._usuarioRepository = usuarioRepository;
     }
 
-    public async Task<DesativarUsuarioResultDto> HandleAsync (
-        DesativarUsuarioCommand command, 
+    public async Task<DesativarUsuarioResultDto> Handle (
+        DesativarUsuarioCommand request, 
         CancellationToken cancellationToken = default)
     {
         var usuario = await _usuarioRepository.ObterUsuarioPorIdAsync(
-            command.UsuarioId,
+            request.UsuarioId,
             cancellationToken);
 
         if(usuario is null)

@@ -1,8 +1,11 @@
-﻿using Tarefas.Application.Abstractions.Persistence;
+﻿using MediatR;
+using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.AtualizarUsuario;
 
-public sealed class AtualizarUsuarioCommandHandler
+public sealed class AtualizarUsuarioCommandHandler 
+    : IRequestHandler<AtualizarUsuarioCommand, AtualizarUsuarioResultDto>
 {
     private readonly IUsuarioRepository _usuarioRepository;
 
@@ -11,12 +14,12 @@ public sealed class AtualizarUsuarioCommandHandler
         _usuarioRepository = usuarioRepository;
     }
 
-    public async Task<AtualizarUsuarioResultDto> HandleAsync (
-        AtualizarUsuarioCommand command, 
+    public async Task<AtualizarUsuarioResultDto> Handle (
+        AtualizarUsuarioCommand request, 
         CancellationToken cancellationToken = default)
     {
         var usuario = await _usuarioRepository.ObterUsuarioPorIdAsync(
-            command.UsuarioId,
+            request.UsuarioId,
             cancellationToken);
 
         if(usuario is null)
@@ -26,8 +29,8 @@ public sealed class AtualizarUsuarioCommandHandler
         }
 
         usuario.AtualizarPerfil(
-            command.Nome,
-            command.Email);
+            request.Nome,
+            request.Email);
 
         await _usuarioRepository.AtualizarAsync(
             usuario,

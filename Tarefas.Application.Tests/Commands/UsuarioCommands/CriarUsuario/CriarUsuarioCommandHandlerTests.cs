@@ -26,7 +26,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         var handler = new CriarUsuarioCommandHandler(repositorio);
 
         // Act
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command);
 
         // Assert
         resultado.Should().NotBeNull();
@@ -54,7 +54,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         var handler = new CriarUsuarioCommandHandler(repositorio);
 
         // Act
-        await handler.HandleAsync(command);
+        await handler.Handle(command);
 
         // Assert
         repositorio.QuantidadeDeAdicoes.Should().Be(1);
@@ -77,7 +77,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         var handler = new CriarUsuarioCommandHandler(repositorio);
 
         // Act
-        await handler.HandleAsync(command, cancellationToken);
+        await handler.Handle(command, cancellationToken);
 
         // Assert
         repositorio.UltimoTokenAdicao.Should().Be(cancellationToken);
@@ -97,7 +97,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         var handler = new CriarUsuarioCommandHandler(repositorio);
 
         // Act
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command);
 
         // Assert
         repositorio.UsuarioAdicionado.Should().NotBeNull();
@@ -126,7 +126,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         var handler = new CriarUsuarioCommandHandler(repositorio);
 
         // Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         // Assert
         await acao.Should()
@@ -151,7 +151,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         var handler = new CriarUsuarioCommandHandler(repositorio);
 
         // Act
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command);
 
         // Assert
         resultado.Nome.Should().Be(nome);
@@ -175,7 +175,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         var handler = new CriarUsuarioCommandHandler(repositorio);
 
         // Act
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command);
 
         // Assert
         resultado.Status.Should().Be(StatusUsuario.Ativo);
@@ -196,7 +196,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         var handler = new CriarUsuarioCommandHandler(repositorio);
 
         // Act
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command);
 
         // Assert
         resultado.UsuarioId.Should().NotBe(Guid.Empty);
@@ -221,7 +221,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         var handler = new CriarUsuarioCommandHandler(repositorio);
 
         // Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         // Assert
         await acao.Should()

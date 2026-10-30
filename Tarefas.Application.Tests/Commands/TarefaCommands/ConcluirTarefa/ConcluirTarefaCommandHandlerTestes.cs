@@ -26,7 +26,7 @@ public sealed class ConcluirTarefaCommandHandlerTestes
         var command = new ConcluirTarefaCommand(tarefa.Id);
 
         //Act
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command);
 
         //Assert
         resultado.TarefaId.Should().Be(tarefa.Id);
@@ -52,7 +52,7 @@ public sealed class ConcluirTarefaCommandHandlerTestes
         var command = new ConcluirTarefaCommand(Guid.NewGuid());
 
         //Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         //Assert
         await acao.Should()
@@ -79,7 +79,7 @@ public sealed class ConcluirTarefaCommandHandlerTestes
         var command = new ConcluirTarefaCommand(tarefa.Id);
 
         //Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         //Assert
         await acao.Should()
@@ -107,7 +107,7 @@ public sealed class ConcluirTarefaCommandHandlerTestes
         var command = new ConcluirTarefaCommand(tarefa.Id);
 
         // Act
-        var act = async () => await handler.HandleAsync(command);
+        var act = async () => await handler.Handle(command);
 
         // Assert
         await act.Should()
@@ -135,7 +135,7 @@ public sealed class ConcluirTarefaCommandHandlerTestes
         var command = new ConcluirTarefaCommand(tarefa.Id);
 
         // Act
-        var act = async () => await handler.HandleAsync(command);
+        var act = async () => await handler.Handle(command);
 
         // Assert
         await act.Should()
@@ -163,7 +163,7 @@ public sealed class ConcluirTarefaCommandHandlerTestes
         var cancellationToken = cts.Token;
 
         // Act
-        await handler.HandleAsync(command, cancellationToken);
+        await handler.Handle(command, cancellationToken);
 
         // Assert
         repositorio.UltimoTokenConsulta.Should()
@@ -188,7 +188,7 @@ public sealed class ConcluirTarefaCommandHandlerTestes
         var command = new ConcluirTarefaCommand(tarefa.Id);
 
         // Act
-        await handler.HandleAsync(command);
+        await handler.Handle(command);
 
         // Assert
         repositorio.UltimoIdConsultado.Should().Be(tarefa.Id);

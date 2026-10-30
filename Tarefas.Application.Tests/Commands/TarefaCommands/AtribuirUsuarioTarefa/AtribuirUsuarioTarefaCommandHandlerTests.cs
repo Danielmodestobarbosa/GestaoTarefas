@@ -41,7 +41,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
             usuario.Id);
 
         //Act
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command, CancellationToken.None);
 
         //Assert
         tarefa.UsuarioId.Should().Be(usuario.Id);
@@ -75,7 +75,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
             usuario.Id);
 
         //Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command, CancellationToken.None);
 
         //Assert
         await acao.Should()
@@ -110,7 +110,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
             Guid.NewGuid());
 
         //Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command, CancellationToken.None);
 
         //Assert
         await acao.Should()
@@ -148,7 +148,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
             usuario.Id);
 
         //Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command, CancellationToken.None);
 
         //Assert
         await acao.Should()
@@ -188,7 +188,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
         var token = cts.Token;
 
         // Act
-        await handler.HandleAsync(command, token);
+        await handler.Handle(command, token);
 
         // Assert
         tarefaRepository.UltimoTokenConsulta.Should().Be(token);
@@ -225,7 +225,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
             usuario.Id);
 
         // Act
-        var act = async () => await handler.HandleAsync(command);
+        var act = async () => await handler.Handle(command, CancellationToken.None);
 
         // Assert
         var excecao = await act.Should()

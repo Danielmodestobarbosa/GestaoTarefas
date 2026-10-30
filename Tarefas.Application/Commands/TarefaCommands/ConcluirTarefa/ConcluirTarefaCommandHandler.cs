@@ -1,8 +1,10 @@
-﻿using Tarefas.Application.Abstractions.Persistence;
+﻿using MediatR;
+using Tarefas.Application.Abstractions.Persistence;
 
 namespace Tarefas.Application.Commands.TarefaCommands.ConcluirTarefa;
 
-public sealed class ConcluirTarefaCommandHandler
+public sealed class ConcluirTarefaCommandHandler 
+    : IRequestHandler<ConcluirTarefaCommand, ConcluirTarefaResultDto>
 {
     private readonly ITarefaRepository _tarefaRepository;
 
@@ -11,12 +13,12 @@ public sealed class ConcluirTarefaCommandHandler
         this._tarefaRepository = tarefaRepository;
     }
 
-    public async Task<ConcluirTarefaResultDto> HandleAsync(
-        ConcluirTarefaCommand command, 
+    public async Task<ConcluirTarefaResultDto> Handle(
+        ConcluirTarefaCommand request, 
         CancellationToken cancellationToken = default)
     {
         var tarefa = await _tarefaRepository.ObterTarefaPorIdAsync(
-            command.TarefaId,
+            request.TarefaId,
             cancellationToken);
 
         if(tarefa is null)

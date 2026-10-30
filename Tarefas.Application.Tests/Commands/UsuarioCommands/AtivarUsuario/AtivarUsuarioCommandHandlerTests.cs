@@ -28,7 +28,7 @@ public sealed class AtivarUsuarioCommandHandlerTests
         var command = new AtivarUsuarioCommand(usuario.Id);
 
         //Act 
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command);
 
         //Assert
         resultado.UsuarioId.Should().Be(usuario.Id);
@@ -54,7 +54,7 @@ public sealed class AtivarUsuarioCommandHandlerTests
         var command = new AtivarUsuarioCommand(Guid.NewGuid());
 
         //Act 
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         //Assert
         await acao.Should()
@@ -83,7 +83,7 @@ public sealed class AtivarUsuarioCommandHandlerTests
         var command = new AtivarUsuarioCommand(Guid.NewGuid());
 
         //Act 
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         //Assert
         await acao.Should()
@@ -111,7 +111,7 @@ public sealed class AtivarUsuarioCommandHandlerTests
         var cancellationToken = cts.Token;
 
         // Act
-        await handler.HandleAsync(command, cancellationToken);
+        await handler.Handle(command, cancellationToken);
 
         // Assert
         repositorio.UltimoTokenConsulta.Should()
@@ -136,7 +136,7 @@ public sealed class AtivarUsuarioCommandHandlerTests
         var command = new AtivarUsuarioCommand(usuario.Id);
 
         // Act
-        await handler.HandleAsync(command);
+        await handler.Handle(command);
 
         // Assert
         repositorio.UltimoIdConsultado.Should().Be(usuario.Id);
@@ -163,7 +163,7 @@ public sealed class AtivarUsuarioCommandHandlerTests
         var command = new AtivarUsuarioCommand(usuario.Id);
 
         // Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         // Assert
         await acao.Should()

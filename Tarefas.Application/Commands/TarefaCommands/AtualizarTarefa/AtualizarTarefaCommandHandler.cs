@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MediatR;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -6,7 +7,8 @@ using Tarefas.Application.Abstractions.Persistence;
 
 namespace Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
 
-public sealed class AtualizarTarefaCommandHandler
+public sealed class AtualizarTarefaCommandHandler 
+    : IRequestHandler<AtualizarTarefaCommand, AtualizarTarefaResultDto>
 {
     private readonly ITarefaRepository _tarefaRepository;
 
@@ -15,12 +17,12 @@ public sealed class AtualizarTarefaCommandHandler
         _tarefaRepository = tarefaRepository;
     }
 
-    public async Task<AtualizarTarefaResultDto> HandleAsync(
-        AtualizarTarefaCommand command, 
+    public async Task<AtualizarTarefaResultDto> Handle(
+        AtualizarTarefaCommand request, 
         CancellationToken cancellationToken = default)
     {
         var tarefa = await _tarefaRepository.ObterTarefaPorIdAsync(
-            command.TarefaId,
+            request.TarefaId,
             cancellationToken);
 
         if(tarefa is null)
@@ -30,9 +32,9 @@ public sealed class AtualizarTarefaCommandHandler
         }
 
         tarefa.Atualizar(
-            command.Titulo,
-            command.Descricao,
-            command.Prioridade);
+            request.Titulo,
+            request.Descricao,
+            request.Prioridade);
 
         await _tarefaRepository.AtualizarAsync(
             tarefa,

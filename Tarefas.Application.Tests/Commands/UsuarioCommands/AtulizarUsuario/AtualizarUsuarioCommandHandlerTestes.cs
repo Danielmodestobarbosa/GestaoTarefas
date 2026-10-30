@@ -32,7 +32,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             novoEmail);
 
         // Act
-        var resultado = await handler.HandleAsync(command);
+        var resultado = await handler.Handle(command);
 
         // Assert
         resultado.UsuarioId.Should().Be(usuario.Id);
@@ -61,7 +61,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             new Email("daniel.barbosa@hotmail.com"));
 
         // Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         // Assert
         await acao.Should()
@@ -92,7 +92,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             new Email("daniel.barbosa@hotmail.com"));
 
         // Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         // Assert
         await acao.Should()
@@ -123,7 +123,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             new Email("daniel.barbosa@hotmail.com"));
 
         // Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         // Assert
         await acao.Should()
@@ -153,7 +153,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             new Email("daniel.barbosa@hotmail.com"));
 
         // Act
-        var acao = async () => await handler.HandleAsync(command);
+        var acao = async () => await handler.Handle(command);
 
         // Assert
         await acao.Should()
@@ -184,7 +184,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
         var cancellationToken = cts.Token;
 
         // Act
-        await handler.HandleAsync(command, cancellationToken);
+        await handler.Handle(command, cancellationToken);
 
         // Assert
         repositorio.UltimoTokenConsulta.Should().Be(cancellationToken);
@@ -208,7 +208,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             new Email("daniel.barbosa@hotmail.com"));
 
         // Act
-        await handler.HandleAsync(command);
+        await handler.Handle(command);
 
         // Assert
         repositorio.UltimoIdConsultado.Should().Be(usuario.Id);

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using MediatR;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Tarefas.Domain.Tarefas.Enums;
 
 namespace Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
 
-public sealed class AtualizarTarefaCommand
+public sealed class AtualizarTarefaCommand : IRequest<AtualizarTarefaResultDto>
 {
     public Guid TarefaId { get; }
     public string Titulo { get; }
@@ -18,6 +19,9 @@ public sealed class AtualizarTarefaCommand
         string descricao, 
         PrioridadeTarefa prioridade)
     {
+        if (tarefaId == Guid.Empty)
+            throw new ArgumentException("TarefaId inválida", nameof(tarefaId));
+
         TarefaId = tarefaId;
         Titulo = titulo;
         Descricao = descricao;

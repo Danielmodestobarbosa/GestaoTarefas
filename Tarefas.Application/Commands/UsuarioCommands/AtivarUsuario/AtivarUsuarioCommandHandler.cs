@@ -1,8 +1,10 @@
-﻿using Tarefas.Application.Abstractions.Persistence;
+﻿using MediatR;
+using Tarefas.Application.Abstractions.Persistence;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.AtivarUsuario;
 
-public sealed class AtivarUsuarioCommandHandler
+public sealed class AtivarUsuarioCommandHandler 
+    : IRequestHandler<AtivarUsuarioCommand, AtivarUsuarioResultDto>
 {
     private readonly IUsuarioRepository _usuarioRepository;
 
@@ -11,12 +13,12 @@ public sealed class AtivarUsuarioCommandHandler
         _usuarioRepository = usuarioRepository;
     }
 
-    public async Task<AtivarUsuarioResultDto> HandleAsync (
-        AtivarUsuarioCommand command, 
+    public async Task<AtivarUsuarioResultDto> Handle (
+        AtivarUsuarioCommand request, 
         CancellationToken cancellationToken = default)
     {
         var usuario = await _usuarioRepository.ObterUsuarioPorIdAsync(
-            command.UsuarioId,
+            request.UsuarioId,
             cancellationToken);
 
         if(usuario is null)
