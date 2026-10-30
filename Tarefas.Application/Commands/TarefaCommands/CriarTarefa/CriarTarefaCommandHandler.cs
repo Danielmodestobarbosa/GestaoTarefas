@@ -23,7 +23,7 @@ public sealed class CriarTarefaCommandHandler
             request.Titulo,
             request.Descricao,
             request.Prioridade);
-
+        
         await _tarefaRepository.AdicionarAsync(
             tarefa,
             cancellationToken);

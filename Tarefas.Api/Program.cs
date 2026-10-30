@@ -9,6 +9,11 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
+//Extensions
+builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddIntegrations();
+
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddApplication();
 

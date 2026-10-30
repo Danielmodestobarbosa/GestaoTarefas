@@ -13,7 +13,6 @@
   <ItemGroup>
     <Folder Include="Commands\TarefaCommands\ConcluirTarefa\" />
     <Folder Include="Commands\TarefaCommands\CancelarTarefa\" />
-    <Folder Include="Queries\" />
   </ItemGroup>
 
   <ItemGroup>
