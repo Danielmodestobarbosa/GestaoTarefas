@@ -52,6 +52,22 @@ public class UsuariosController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("externo/{usuarioId:int}")]
+    [EndpointSummary("Consulta os dados de um usuário na API externa.")]
+    public async Task<IActionResult> ObterUsuarioExterno(
+    [FromRoute] int usuarioId,
+    CancellationToken cancellationToken)
+    {
+        var query = new ObterUsuarioExternoQuery(usuarioId);
+
+        var response = await _mediator.Send(query, cancellationToken);
+
+        if (response is null)
+            return NotFound();
+
+        return Ok(response);
+    }
+
     [HttpPost]
     [EndpointSummary("Cadastra um novo usuário no sistema.")]
     public async Task<IActionResult> CriarUsuario(
@@ -110,19 +126,4 @@ public class UsuariosController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("externo/{usuarioId:int}")]
-    [EndpointSummary("Consulta os dados de um usuário na API externa.")]
-    public async Task<IActionResult> ObterUsuarioExterno(
-        [FromRoute] int usuarioId,
-        CancellationToken cancellationToken)
-    {
-        var query = new ObterUsuarioExternoQuery(usuarioId);
-
-        var response = await _mediator.Send(query, cancellationToken);
-
-        if (response is null)
-            return NotFound();
-
-        return Ok(response);
-    }
 }

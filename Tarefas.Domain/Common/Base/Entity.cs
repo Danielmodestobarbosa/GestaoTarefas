@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tarefas.Domain.Common.Interfaces;
+﻿using Tarefas.Domain.Common.Interfaces;
 
 namespace Tarefas.Domain.Common.Base
 {

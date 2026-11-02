@@ -7,8 +7,34 @@ using Tarefas.Domain.Integration.Usuarios;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+//Converte os enums para string no Swagger
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddSchemaTransformer((schema, context, cancellationToken) =>
+    {
+        var type = context.JsonTypeInfo.Type;
+
+        if (type.IsEnum)
+        {
+            schema.Type = Microsoft.OpenApi.JsonSchemaType.String;
+
+            schema.Enum = Enum.GetNames(type)
+                .Select(nome => System.Text.Json.Nodes.JsonValue.Create(nome)!)
+                .Cast<System.Text.Json.Nodes.JsonNode>()
+                .ToList();
+        }
+
+        return Task.CompletedTask;
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 //Extensions

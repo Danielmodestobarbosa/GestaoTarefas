@@ -1,7 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Tarefas.Domain.Tarefas.Enums;
 
 namespace Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
 using Tarefas.Application.Abstractions.Persistence;
-using Tarefas.Domain.Tarefas.Entities;
 
 namespace Tarefas.Application.Commands.TarefaCommands.IniciarTarefa;
 
 public sealed class IniciarTarefaCommandHandler
+    : IRequestHandler<IniciarTarefaCommand, IniciarTarefaResultDto>
 {
     private readonly ITarefaRepository _tarefaRepository;
 
@@ -15,18 +13,17 @@ public sealed class IniciarTarefaCommandHandler
         _tarefaRepository = tarefaRepository;
     }
 
-    public async Task<IniciarTarefaResultDto> HandleAsync (
-        IniciarTarefaCommand command, 
-        CancellationToken cancellationToken = default)
+    public async Task<IniciarTarefaResultDto> Handle(
+        IniciarTarefaCommand request,
+        CancellationToken cancellationToken)
     {
         var tarefa = await _tarefaRepository.ObterTarefaPorIdAsync(
-            command.TarefaId,
+            request.TarefaId,
             cancellationToken);
 
-        if(tarefa is null)
+        if (tarefa is null)
         {
-            throw new InvalidOperationException(
-                "Tarefa não encontrada");
+            throw new InvalidOperationException("Tarefa não encontrada");
         }
 
         tarefa.Iniciar();
@@ -40,7 +37,5 @@ public sealed class IniciarTarefaCommandHandler
             tarefa.Titulo,
             tarefa.Status,
             tarefa.Prioridade);
-
     }
 }
-

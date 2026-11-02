@@ -1,9 +1,6 @@
-﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
+using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
-using Tarefas.Application.Commands.TarefaCommands.ConcluirTarefa;
 using Tarefas.Application.Commands.TarefaCommands.IniciarTarefa;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
@@ -13,9 +10,9 @@ namespace Tarefas.Application.Tests.Commands.TarefaCommands.IniciarTarefa;
 public sealed class IniciarTarefaCommandHandlerTests
 {
     [Fact(DisplayName = "Deve iniciar tarefa quando encontrada")]
-    public async Task Deve_Concluir_Tarefa_Quando_Encontrada()
+    public async Task Deve_Iniciar_Tarefa_Quando_Encontrada()
     {
-        //Arrange
+        // Arrange
         var tarefa = new Tarefa(
             "Estudar C#",
             "Estudar testes unitários",
@@ -23,13 +20,12 @@ public sealed class IniciarTarefaCommandHandlerTests
 
         var repositorio = new FakeTarefaRepository(tarefa);
         var handler = new IniciarTarefaCommandHandler(repositorio);
-
         var command = new IniciarTarefaCommand(tarefa.Id);
 
-        //Act
-        var resultado = await handler.HandleAsync(command);
+        // Act
+        var resultado = await handler.Handle(command, CancellationToken.None);
 
-        //Assert
+        // Assert
         resultado.TarefaId.Should().Be(tarefa.Id);
         resultado.Titulo.Should().Be("Estudar C#");
         resultado.Status.Should().Be(StatusTarefa.EmAndamento);
@@ -39,8 +35,9 @@ public sealed class IniciarTarefaCommandHandlerTests
     }
 
     [Fact(DisplayName = "Deve lançar exceção quando a tarefa não for encontrada")]
-    public async Task Deve_Lançar_Exceção_Quando_Tarefa_Nao_For_Encontrada()
+    public async Task Deve_Lancar_Excecao_Quando_Tarefa_Nao_For_Encontrada()
     {
+        // Arrange
         var tarefa = new Tarefa(
             "Estudar C#",
             "Estudar testes unitários",
@@ -48,14 +45,13 @@ public sealed class IniciarTarefaCommandHandlerTests
 
         var repositorio = new FakeTarefaRepository(tarefa);
         var handler = new IniciarTarefaCommandHandler(repositorio);
-
         var command = new IniciarTarefaCommand(Guid.NewGuid());
 
-        //Act
-        var acao = async () => await handler.HandleAsync(command);
+        // Act
+        var act = async () => await handler.Handle(command, CancellationToken.None);
 
-        //Assert
-        await acao.Should()
+        // Assert
+        await act.Should()
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Tarefa não encontrada");
 
@@ -80,7 +76,7 @@ public sealed class IniciarTarefaCommandHandlerTests
         var command = new IniciarTarefaCommand(tarefa.Id);
 
         // Act
-        var act = async () => await handler.HandleAsync(command);
+        var act = async () => await handler.Handle(command, CancellationToken.None);
 
         // Assert
         await act.Should()
@@ -108,7 +104,7 @@ public sealed class IniciarTarefaCommandHandlerTests
         var command = new IniciarTarefaCommand(tarefa.Id);
 
         // Act
-        var act = async () => await handler.HandleAsync(command);
+        var act = async () => await handler.Handle(command, CancellationToken.None);
 
         // Assert
         await act.Should()
@@ -123,27 +119,23 @@ public sealed class IniciarTarefaCommandHandlerTests
     {
         // Arrange
         var tarefa = new Tarefa(
-            "Título antigo",
-            "Descrição antiga",
+            "Estudar C#",
+            "Estudar testes unitários",
             PrioridadeTarefa.Alta);
 
         var repositorio = new FakeTarefaRepository(tarefa);
         var handler = new IniciarTarefaCommandHandler(repositorio);
-
         var command = new IniciarTarefaCommand(tarefa.Id);
 
         using var cts = new CancellationTokenSource();
         var cancellationToken = cts.Token;
 
         // Act
-        await handler.HandleAsync(command, cancellationToken);
+        await handler.Handle(command, cancellationToken);
 
         // Assert
-        repositorio.UltimoTokenConsulta.Should()
-            .Be(cancellationToken);
-
-        repositorio.UltimoTokenAtualizacao.Should()
-            .Be(cancellationToken);
+        repositorio.UltimoTokenConsulta.Should().Be(cancellationToken);
+        repositorio.UltimoTokenAtualizacao.Should().Be(cancellationToken);
     }
 
     [Fact(DisplayName = "Deve consultar usando o ID correto da tarefa")]
@@ -157,17 +149,14 @@ public sealed class IniciarTarefaCommandHandlerTests
 
         var repositorio = new FakeTarefaRepository(tarefa);
         var handler = new IniciarTarefaCommandHandler(repositorio);
-
         var command = new IniciarTarefaCommand(tarefa.Id);
 
         // Act
-        await handler.HandleAsync(command);
+        await handler.Handle(command, CancellationToken.None);
 
         // Assert
         repositorio.UltimoIdConsultado.Should().Be(tarefa.Id);
     }
-
-
 }
 
 internal sealed class FakeTarefaRepository : ITarefaRepository
@@ -180,48 +169,54 @@ internal sealed class FakeTarefaRepository : ITarefaRepository
     }
 
     public bool DeveFalharAoAtualizar { get; set; }
-    public int QuantidadeDeAtualizacoes { get; private set; }
     public bool DeveFalharAoConsultar { get; set; }
+
+    public int QuantidadeDeAtualizacoes { get; private set; }
+
     public CancellationToken UltimoTokenConsulta { get; private set; }
     public CancellationToken UltimoTokenAtualizacao { get; private set; }
+
     public Guid UltimoIdConsultado { get; private set; }
 
     public Task<Tarefa?> ObterTarefaPorIdAsync(
-        Guid tarefaId, CancellationToken
-        cancellationToken = default)
+        Guid tarefaId,
+        CancellationToken cancellationToken = default)
     {
+        UltimoIdConsultado = tarefaId;
         UltimoTokenConsulta = cancellationToken;
 
         if (DeveFalharAoConsultar)
+        {
             throw new InvalidOperationException(
                 "Falha simulada ao consultar tarefa");
+        }
 
         return Task.FromResult<Tarefa?>(
             tarefaId == _tarefa.Id ? _tarefa : null);
     }
 
     public Task AdicionarAsync(
-        Tarefa tarefa, 
+        Tarefa tarefa,
         CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
     public Task AtualizarAsync(
-        Tarefa tarefa, 
+        Tarefa tarefa,
         CancellationToken cancellationToken = default)
     {
-        UltimoIdConsultado = tarefa.Id;
-
         UltimoTokenAtualizacao = cancellationToken;
-
         QuantidadeDeAtualizacoes++;
 
         if (DeveFalharAoAtualizar)
+        {
             throw new InvalidOperationException(
                 "Falha simulada ao atualizar tarefa");
+        }
 
         return Task.CompletedTask;
     }
 }
+
 
