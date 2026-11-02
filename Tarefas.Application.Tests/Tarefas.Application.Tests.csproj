@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tarefas.Application\Tarefas.Application.csproj" />
+    <ProjectReference Include="..\Tarefas.Infraestructure\Tarefas.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

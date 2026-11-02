@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tarefas.Application.Commands.TarefaCommands.CriarTarefa;
 using Tarefas.Application.Queries.Tarefas.ListarTarefas;
 using Tarefas.Application.Queries.Tarefas.ObterTarefaPorIdQuery;
+using Tarefas.Domain.Integration.Usuarios;
 
 namespace Tarefas.Infrastructure.Extensions;
 
@@ -19,6 +20,8 @@ public static class ApplicationExtensions
         // Query Handlers existentes
         services.AddScoped<ObterTarefaPorIdQueryHandler>();
         services.AddScoped<ListarTarefasQueryHandler>();
+
+        services.AddScoped<UsuarioAcl>();
 
         return services;
     }

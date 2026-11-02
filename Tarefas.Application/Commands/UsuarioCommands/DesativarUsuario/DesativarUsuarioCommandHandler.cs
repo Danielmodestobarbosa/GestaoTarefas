@@ -24,7 +24,7 @@ public sealed class DesativarUsuarioCommandHandler
         if(usuario is null)
         {
             throw new InvalidOperationException(
-                "Usuario não enconrado");
+                "Usuario não encontrado");
         }
 
         usuario.DesativarPerfil();

@@ -1,13 +1,14 @@
-﻿namespace Tarefas.Domain.Integration.Usuarios;
+﻿using System.Text.Json.Serialization;
 
-// Representa os dados recebidos de um sistema externo.
-// Não é uma entidade do domínio.
-// Não possui regras de negócio.
-// É apenas um objeto de transporte de dados.
+namespace Tarefas.Domain.Integration.Usuarios;
+
 public sealed class UsuarioExternoDto
 {
     public int Id { get; }
+
+    [JsonPropertyName("name")]
     public string Nome { get; }
+
     public string Email { get; }
 
     public UsuarioExternoDto(int id, string nome, string email)

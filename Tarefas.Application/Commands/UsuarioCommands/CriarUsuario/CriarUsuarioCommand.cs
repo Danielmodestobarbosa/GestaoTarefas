@@ -1,7 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Tarefas.Domain.Usuarios.ValueObjects;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.CriarUsuario;

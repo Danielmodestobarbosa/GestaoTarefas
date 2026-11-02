@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -14,11 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tarefas.Application\Tarefas.Application.csproj" />
-    <ProjectReference Include="..\Tarefas.Infraestructure\Tarefas.Infraestructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Tarefas.Infraestructure\Tarefas.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

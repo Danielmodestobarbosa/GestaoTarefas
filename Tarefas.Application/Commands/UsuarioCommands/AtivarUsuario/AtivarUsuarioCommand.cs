@@ -1,7 +1,4 @@
-﻿
-
-using MediatR;
-using Tarefas.Domain.Tarefas.Entities;
+﻿using MediatR;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.AtivarUsuario;
 

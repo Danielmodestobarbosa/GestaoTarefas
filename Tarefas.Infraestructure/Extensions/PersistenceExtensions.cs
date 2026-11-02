@@ -6,6 +6,7 @@ using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Domain.Common.Interfaces;
 using Tarefas.Infrastructure.Event;
 using Tarefas.Infrastructure.Persistence;
+using Tarefas.Infrastructure.Persistence.Repositories;
 using Tarefas.Infrastructure.Repositories;
 
 namespace Tarefas.Infrastructure.Extensions;
@@ -31,6 +32,7 @@ public static class PersistenceExtensions
         services.AddScoped<ITarefaRepository, TarefaRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<ITarefaQueryRepository, TarefaQueryRepository>();
+        services.AddScoped<IUsuarioQueryRepository, UsuarioQueryRepository>();
 
         services.AddScoped<
             IDomainEventDispatcher,

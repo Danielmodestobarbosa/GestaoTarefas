@@ -32,10 +32,10 @@ namespace Tarefas.Domain.Common.Base
             DataCriacao = DateTime.UtcNow;
         }
         
-        //Sobrescrever Equals e GetHashCode é crucial para compara Entidades baseado apenas na sua identidade (ID)
+        //Sobrescrever Equals e GetHashCode é crucial para comparar Entidades baseado apenas na sua identidade (ID)
         public override bool Equals(object? obj)
         {
-            //Pede para se é realmente uma entidade, caso não seja, retorna false e estará disponível na variável other
+            //Pede se é realmente uma entidade, caso não seja, retorna false e estará disponível na variável other
             if (obj is not Entity other) return false;
 
             //Estou comparando um objeto com ele mesmo, se sim retorna true

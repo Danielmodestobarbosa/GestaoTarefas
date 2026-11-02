@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Tarefas.Application.Abstractions.Persistence;
-using Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.AtualizarUsuario;
 

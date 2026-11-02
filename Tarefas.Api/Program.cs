@@ -1,7 +1,9 @@
 
 using Microsoft.EntityFrameworkCore;
+using Tarefas.Api.Exceptions;
 using Tarefas.Infrastructure.Extensions;
 using Tarefas.Infrastructure.Persistence;
+using Tarefas.Domain.Integration.Usuarios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,10 +16,13 @@ builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddIntegrations();
 
-builder.Services.AddPersistence(builder.Configuration);
-builder.Services.AddApplication();
+//ExceptionHandler
+builder.Services.AddExceptionHandler<TarefasExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {

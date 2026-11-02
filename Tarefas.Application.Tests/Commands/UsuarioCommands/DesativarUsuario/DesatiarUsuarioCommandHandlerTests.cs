@@ -60,7 +60,7 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         // Assert
         await acao.Should()
             .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Usuario não enconrado");
+            .WithMessage("Usuario não encontrado");
 
         repositorio.UltimoIdConsultado.Should().Be(usuarioId);
         repositorio.QuantidadeDeAtualizacoes.Should().Be(0);

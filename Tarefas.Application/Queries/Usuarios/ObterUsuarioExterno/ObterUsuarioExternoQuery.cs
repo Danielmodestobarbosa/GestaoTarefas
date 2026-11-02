@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using Tarefas.Application.Queries.Usuarios.DTOs;
 
-namespace Tarefas.Application.Queries.Usuarios.ObterUsuarioExterno
-{
-    internal class ObterUsuarioExternoQuery
-    {
-    }
-}
+namespace Tarefas.Application.Queries.Usuarios.ObterUsuarioExterno;
+
+public sealed record ObterUsuarioExternoQuery(int UsuarioId)
+    : IRequest<ObterUsuarioExternoResultDto?>;

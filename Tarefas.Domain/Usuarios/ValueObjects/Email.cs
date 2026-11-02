@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tarefas.Domain.Common.Base;
+﻿using Tarefas.Domain.Common.Base;
 using Tarefas.Domain.Common.Eexceptions;
 using Tarefas.Domain.Common.Validations;
 

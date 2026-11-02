@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tarefas.Domain.Common.Base;
+﻿using Tarefas.Domain.Common.Base;
 using Tarefas.Domain.Common.Eexceptions;
 using Tarefas.Domain.Common.Validations;
-using Tarefas.Domain.Tarefas.Enums;
 using Tarefas.Domain.Usuarios.Enums;
 using Tarefas.Domain.Usuarios.Events;
 using Tarefas.Domain.Usuarios.ValueObjects;
