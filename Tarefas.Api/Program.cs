@@ -1,9 +1,8 @@
 
-using Microsoft.EntityFrameworkCore;
 using Tarefas.Api.Exceptions;
 using Tarefas.Infrastructure.Extensions;
 using Tarefas.Infrastructure.Persistence;
-using Tarefas.Domain.Integration.Usuarios;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

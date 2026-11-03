@@ -1,8 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using Tarefas.Application.Abstractions.Persistence;
 
 namespace Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
