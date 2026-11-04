@@ -118,6 +118,10 @@ public sealed class Tarefa : AggregateRoot
             Status != StatusTarefa.EmAndamento,
             "Não é possível atribuir um usuário a uma tarefa concluída ou cancelada");
 
+        // Se já estiver atribuído ao mesmo usuário, não altera nada.
+        if (UsuarioId == usuarioId)
+            return;
+
         UsuarioId = usuarioId;
 
         SetDataAtualizacao();
