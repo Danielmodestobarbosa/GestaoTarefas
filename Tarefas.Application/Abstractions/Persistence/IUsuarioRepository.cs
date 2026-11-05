@@ -12,8 +12,5 @@ public interface IUsuarioRepository
         Usuario usuario, 
         CancellationToken cancellationToken = default);
 
-    Task AtualizarAsync(
-        Usuario usuario, 
-        CancellationToken cancellationToken = default);
 }
 

@@ -7,10 +7,14 @@ public sealed class CancelarTarefaCommandHandler :
     IRequestHandler<CancelarTarefaCommand, CancelarTarefaResultDto>
 {
     private readonly ITarefaRepository _tarefaRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CancelarTarefaCommandHandler(ITarefaRepository tarefaRepository)
+    public CancelarTarefaCommandHandler(
+        ITarefaRepository tarefaRepository, 
+        IUnitOfWork unitOfWork)
     {
         _tarefaRepository = tarefaRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<CancelarTarefaResultDto> Handle (
@@ -29,9 +33,7 @@ public sealed class CancelarTarefaCommandHandler :
 
         tarefa.Cancelar();
 
-        await _tarefaRepository.AtualizarAsync(
-            tarefa, 
-            cancellationToken);
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return new CancelarTarefaResultDto(
             tarefa.Id,

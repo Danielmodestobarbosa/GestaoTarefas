@@ -7,10 +7,14 @@ public sealed class AtualizarUsuarioCommandHandler
     : IRequestHandler<AtualizarUsuarioCommand, AtualizarUsuarioResultDto>
 {
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AtualizarUsuarioCommandHandler(IUsuarioRepository usuarioRepository)
+    public AtualizarUsuarioCommandHandler(
+        IUsuarioRepository usuarioRepository, 
+        IUnitOfWork unitOfWork)
     {
         _usuarioRepository = usuarioRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<AtualizarUsuarioResultDto> Handle (
@@ -31,9 +35,7 @@ public sealed class AtualizarUsuarioCommandHandler
             request.Nome,
             request.Email);
 
-        await _usuarioRepository.AtualizarAsync(
-            usuario,
-            cancellationToken);
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return new AtualizarUsuarioResultDto(
             usuario.Id,

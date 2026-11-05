@@ -33,6 +33,7 @@ public static class PersistenceExtensions
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<ITarefaQueryRepository, TarefaQueryRepository>();
         services.AddScoped<IUsuarioQueryRepository, UsuarioQueryRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<
             IDomainEventDispatcher,

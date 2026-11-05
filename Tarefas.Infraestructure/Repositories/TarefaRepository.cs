@@ -30,13 +30,6 @@ public sealed class TarefaRepository : ITarefaRepository
         CancellationToken cancellationToken = default)
     {
         await _context.Tarefas.AddAsync(tarefa, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AtualizarAsync(
-        Tarefa tarefa,
-        CancellationToken cancellationToken = default)
-    {
-        await _context.SaveChangesAsync(cancellationToken);
-    }
 }

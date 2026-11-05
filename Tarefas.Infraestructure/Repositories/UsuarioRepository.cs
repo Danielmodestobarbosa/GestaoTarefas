@@ -30,13 +30,5 @@ public sealed class UsuarioRepository : IUsuarioRepository
         CancellationToken cancellationToken = default)
     {
         await _context.Usuarios.AddAsync(usuario, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task AtualizarAsync(
-        Usuario usuario,
-        CancellationToken cancellationToken = default)
-    {
-        await _context.SaveChangesAsync(cancellationToken);
     }
 }

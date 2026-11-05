@@ -9,13 +9,16 @@ public sealed class AtribuirUsuarioTarefaCommandHandler
 {
     private readonly ITarefaRepository _tarefaRepository;
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public AtribuirUsuarioTarefaCommandHandler(
         ITarefaRepository tarefaRepository,
-        IUsuarioRepository usuarioRepository)
+        IUsuarioRepository usuarioRepository,
+        IUnitOfWork unitOfWork)
     {
         _tarefaRepository = tarefaRepository;
         _usuarioRepository = usuarioRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<AtribuirUsuarioResultDto> Handle(
@@ -50,9 +53,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandler
 
         tarefa.AtribuirUsuario(usuario.Id);
 
-        await _tarefaRepository.AtualizarAsync(
-            tarefa,
-            cancellationToken);
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return new AtribuirUsuarioResultDto(
             tarefa.Id,

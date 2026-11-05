@@ -1,10 +1,7 @@
 ﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.AtribuirUsuarioTarefa;
-using Tarefas.Domain.Common.Eexceptions;
+using Tarefas.Application.Tests.Fakes;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
 using Tarefas.Domain.Usuarios.Entities;
@@ -31,10 +28,12 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         var tarefaRepository = new FakeTarefaCommandRepository(tarefa);
         var usuarioRepository = new FakeUsuarioRepository(usuario);
+        var unitOfWork = new FakeUnitOfWork();
 
         var handler = new AtribuirUsuarioTarefaCommandHandler(
             tarefaRepository,
-            usuarioRepository);
+            usuarioRepository,
+            unitOfWork);
 
         var command = new AtribuirUsuarioTarefaCommand(
             tarefa.Id,
@@ -47,7 +46,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
         tarefa.UsuarioId.Should().Be(usuario.Id);
         resultado.TarefaId.Should().Be(tarefa.Id);
         resultado.UsuarioId.Should().Be(usuario.Id);
-        tarefaRepository.QuantidadeDeAtualizacoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
     [Fact(DisplayName = "Deve lançar exceção quando a tarefa não for encontrada")]
@@ -65,10 +64,12 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         var tarefaRepository = new FakeTarefaCommandRepository(tarefa);
         var usuarioRepository = new FakeUsuarioRepository(usuario);
+        var unitOfWork = new FakeUnitOfWork();
 
         var handler = new AtribuirUsuarioTarefaCommandHandler(
             tarefaRepository,
-            usuarioRepository);
+            usuarioRepository,
+            unitOfWork);
 
         var command = new AtribuirUsuarioTarefaCommand(
             Guid.NewGuid(),
@@ -82,7 +83,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Tarefa não encontrada");
 
-        tarefaRepository.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
     [Fact(DisplayName = "Deve lançar exceção quando o usuário não for encontrado")]
@@ -100,10 +101,12 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         var tarefaRepository = new FakeTarefaCommandRepository(tarefa);
         var usuarioRepository = new FakeUsuarioRepository(usuario);
+        var unitOfWork = new FakeUnitOfWork();
 
         var handler = new AtribuirUsuarioTarefaCommandHandler(
             tarefaRepository,
-            usuarioRepository);
+            usuarioRepository,
+            unitOfWork);
 
         var command = new AtribuirUsuarioTarefaCommand(
             tarefa.Id,
@@ -118,7 +121,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
             .WithMessage("Usuário não encontrado");
 
         tarefa.UsuarioId.Should().BeNull();
-        tarefaRepository.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
     [Fact(DisplayName = "Deve lançar exceção quando o usuário estivar inativo")]
@@ -138,10 +141,12 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         var tarefaRepository = new FakeTarefaCommandRepository(tarefa);
         var usuarioRepository = new FakeUsuarioRepository(usuario);
+        var unitOfWork = new FakeUnitOfWork();
 
         var handler = new AtribuirUsuarioTarefaCommandHandler(
             tarefaRepository,
-            usuarioRepository);
+            usuarioRepository,
+            unitOfWork);
 
         var command = new AtribuirUsuarioTarefaCommand(
             tarefa.Id,
@@ -156,7 +161,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
             .WithMessage("Não é possível atribuir uma tarefa a um usuário inativo");
 
         tarefa.UsuarioId.Should().BeNull();
-        tarefaRepository.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
 
@@ -175,10 +180,12 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         var tarefaRepository = new FakeTarefaCommandRepository(tarefa);
         var usuarioRepository = new FakeUsuarioRepository(usuario);
+        var unitOfWork = new FakeUnitOfWork();
 
         var handler = new AtribuirUsuarioTarefaCommandHandler(
             tarefaRepository,
-            usuarioRepository);
+            usuarioRepository,
+            unitOfWork);
 
         var command = new AtribuirUsuarioTarefaCommand(
             tarefa.Id,
@@ -193,11 +200,11 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
         // Assert
         tarefaRepository.UltimoTokenConsulta.Should().Be(token);
         usuarioRepository.UltimoTokenConsulta.Should().Be(token);
-        tarefaRepository.UltimoTokenAtualizacao.Should().Be(token);
+        unitOfWork.UltimoTokenCommit.Should().Be(token);
     }
 
-    [Fact(DisplayName = "Deve propagar a exceção quando ocorrer uma falha ao atualizar a tarefa")]
-    public async Task Deve_Propagar_Excecao_Quando_Falhar_A_Atualizacao_Da_Tarefa()
+    [Fact(DisplayName = "Deve propagar a exceção quando ocorrer uma falha ao salvar a tarefa")]
+    public async Task Deve_Propagar_Excecao_Quando_Falhar_Ao_Salvar_A_Tarefa()
     {
         // Arrange
         var tarefa = new Tarefa(
@@ -209,23 +216,28 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
             new NomeUsuario("Daniel Modesto"),
             new Email("daniel@hotmail.com"));
 
-        var tarefaRepository = new FakeTarefaCommandRepository(tarefa)
-        {
-            ExcecaoAoAtualizar = new InvalidOperationException("Falha ao salvar tarefa")
-        };
-
+        var tarefaRepository = new FakeTarefaCommandRepository(tarefa);
         var usuarioRepository = new FakeUsuarioRepository(usuario);
+
+        var unitOfWork = new FakeUnitOfWork
+        {
+            ExcecaoAoCommit = new InvalidOperationException(
+                "Falha ao salvar tarefa")
+        };
 
         var handler = new AtribuirUsuarioTarefaCommandHandler(
             tarefaRepository,
-            usuarioRepository);
+            usuarioRepository,
+            unitOfWork);
 
         var command = new AtribuirUsuarioTarefaCommand(
             tarefa.Id,
             usuario.Id);
 
         // Act
-        var act = async () => await handler.Handle(command, CancellationToken.None);
+        var act = async () => await handler.Handle(
+            command,
+            CancellationToken.None);
 
         // Assert
         var excecao = await act.Should()
@@ -233,7 +245,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         excecao.Which.Message.Should().Be("Falha ao salvar tarefa");
 
-        tarefaRepository.QuantidadeDeAtualizacoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
     #endregion
@@ -244,48 +256,36 @@ internal sealed class FakeTarefaCommandRepository : ITarefaRepository
 {
     private readonly Tarefa _tarefa;
 
-    public int QuantidadeDeAtualizacoes { get; private set; }
     public CancellationToken UltimoTokenConsulta { get; private set; }
-    public CancellationToken UltimoTokenAtualizacao { get; private set; }
-    public Exception? ExcecaoAoAtualizar { get; set; }
 
     public FakeTarefaCommandRepository(Tarefa tarefa)
     {
         _tarefa = tarefa;
     }
 
-    public Task<Tarefa?> ObterTarefaPorIdAsync (
+    public Task<Tarefa?> ObterTarefaPorIdAsync(
         Guid tarefaId,
         CancellationToken cancellationToken = default)
     {
         UltimoTokenConsulta = cancellationToken;
-        return Task.FromResult(_tarefa.Id == tarefaId ? _tarefa : null);
+
+        return Task.FromResult(
+            _tarefa.Id == tarefaId ? _tarefa : null);
     }
 
     public Task AdicionarAsync(
         Tarefa tarefa,
         CancellationToken cancellationToken = default)
     {
-        UltimoTokenAtualizacao = cancellationToken;
         throw new NotImplementedException();
     }
-    public Task AtualizarAsync(
-        Tarefa tarefa,
-        CancellationToken cancellationToken = default)
-    {
-        QuantidadeDeAtualizacoes++;
-        UltimoTokenAtualizacao = cancellationToken;
-
-        if (ExcecaoAoAtualizar is not null)
-            throw ExcecaoAoAtualizar;
-
-        return Task.CompletedTask;
-    }
 }
+
 
 internal sealed class FakeUsuarioRepository : IUsuarioRepository
 {
     private readonly Usuario _usuario;
+
     public CancellationToken UltimoTokenConsulta { get; private set; }
 
     public FakeUsuarioRepository(Usuario usuario)
@@ -293,26 +293,22 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
         _usuario = usuario;
     }
 
-    public Task<Usuario?> ObterUsuarioPorIdAsync (
+    public Task<Usuario?> ObterUsuarioPorIdAsync(
         Guid usuarioId,
         CancellationToken cancellationToken = default)
     {
         UltimoTokenConsulta = cancellationToken;
-        return Task.FromResult(_usuario.Id == usuarioId ? _usuario : null);
+
+        return Task.FromResult(
+            _usuario.Id == usuarioId ? _usuario : null);
     }
 
-    public Task AdicionarAsync (
-        Usuario usuario,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task AtualizarAsync (
+    public Task AdicionarAsync(
         Usuario usuario,
         CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 }
+
 

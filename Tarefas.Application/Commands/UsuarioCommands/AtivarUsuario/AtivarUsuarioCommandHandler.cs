@@ -7,15 +7,19 @@ public sealed class AtivarUsuarioCommandHandler
     : IRequestHandler<AtivarUsuarioCommand, AtivarUsuarioResultDto>
 {
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AtivarUsuarioCommandHandler(IUsuarioRepository usuarioRepository)
+    public AtivarUsuarioCommandHandler(
+        IUsuarioRepository usuarioRepository, 
+        IUnitOfWork unitOfWork)
     {
         _usuarioRepository = usuarioRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<AtivarUsuarioResultDto> Handle (
         AtivarUsuarioCommand request, 
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var usuario = await _usuarioRepository.ObterUsuarioPorIdAsync(
             request.UsuarioId,
@@ -28,9 +32,7 @@ public sealed class AtivarUsuarioCommandHandler
 
         usuario.AtivarUsuario();
 
-        await _usuarioRepository.AtualizarAsync(
-            usuario,
-            cancellationToken);
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return new AtivarUsuarioResultDto(
             usuario.Id,

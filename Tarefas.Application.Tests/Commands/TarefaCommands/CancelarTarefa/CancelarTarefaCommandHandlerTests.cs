@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
+using System.Runtime.InteropServices.Marshalling;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
 using Tarefas.Application.Commands.TarefaCommands.CancelarTarefa;
+using Tarefas.Application.Tests.Fakes;
 using Tarefas.Domain.Common.Eexceptions;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
@@ -21,7 +24,11 @@ public sealed class CancelarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         var repositorio = new FakeTarefaRepository(tarefa);
-        var handler = new CancelarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CancelarTarefaCommandHandler(
+            repositorio, 
+            unitOfWork);
 
         var command = new CancelarTarefaCommand(tarefa.Id);
 
@@ -34,7 +41,7 @@ public sealed class CancelarTarefaCommandHandlerTests
         resultado.Status.Should().Be(StatusTarefa.Cancelada);
         resultado.Prioridade.Should().Be(PrioridadeTarefa.Alta);
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
     [Fact(DisplayName = "Deve lançar exceção quando a tarefa não for encontrada")]
@@ -46,7 +53,11 @@ public sealed class CancelarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         var repositorio = new FakeTarefaRepository(tarefa);
-        var handler = new CancelarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CancelarTarefaCommandHandler(
+            repositorio, 
+            unitOfWork);
 
         var command = new CancelarTarefaCommand(Guid.NewGuid());
 
@@ -58,7 +69,7 @@ public sealed class CancelarTarefaCommandHandlerTests
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Tarefa não encontrada");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
     [Fact(DisplayName = "Propagar erro ao tentar cancelar tarefa concluída")]
@@ -73,7 +84,11 @@ public sealed class CancelarTarefaCommandHandlerTests
         tarefa.Concluir();
 
         var repositorio = new FakeTarefaRepository(tarefa);
-        var handler = new CancelarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CancelarTarefaCommandHandler(
+            repositorio, 
+            unitOfWork);
 
         var command = new CancelarTarefaCommand(tarefa.Id);
 
@@ -85,7 +100,7 @@ public sealed class CancelarTarefaCommandHandlerTests
             .ThrowAsync<DomainException>()
             .WithMessage("A tarefa não pode ser cancelada pois está concluída.");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
 
@@ -98,12 +113,18 @@ public sealed class CancelarTarefaCommandHandlerTests
             "Estudar testes unitários",
             PrioridadeTarefa.Alta);
 
-        var repositorio = new FakeTarefaRepository(tarefa)
+        var repositorio = new FakeTarefaRepository(tarefa);
+
+        var unitOfWork = new FakeUnitOfWork
         {
-            DeveFalharAoAtualizar = true
+            ExcecaoAoCommit = new InvalidOperationException(
+                "Falha simulada ao atualizar tarefa")
         };
 
-        var handler = new CancelarTarefaCommandHandler(repositorio);
+        var handler = new CancelarTarefaCommandHandler(
+            repositorio,
+            unitOfWork);
+
         var command = new CancelarTarefaCommand(tarefa.Id);
 
         // Act
@@ -114,7 +135,7 @@ public sealed class CancelarTarefaCommandHandlerTests
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Falha simulada ao atualizar tarefa");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
     [Fact(DisplayName = "Deve propagar exceção quando a consulta no repositório falhar")]
@@ -131,7 +152,11 @@ public sealed class CancelarTarefaCommandHandlerTests
             DeveFalharAoConsultar = true
         };
 
-        var handler = new CancelarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+        var handler = new CancelarTarefaCommandHandler(
+            repositorio, 
+            unitOfWork);
+
         var command = new CancelarTarefaCommand(tarefa.Id);
 
         // Act
@@ -142,7 +167,7 @@ public sealed class CancelarTarefaCommandHandlerTests
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Falha simulada ao consultar tarefa");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
     [Fact(DisplayName = "Deve encaminhar o CancellationToken ao repositório")]
@@ -155,7 +180,11 @@ public sealed class CancelarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         var repositorio = new FakeTarefaRepository(tarefa);
-        var handler = new CancelarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CancelarTarefaCommandHandler(
+            repositorio, 
+            unitOfWork);
 
         var command = new CancelarTarefaCommand(tarefa.Id);
 
@@ -169,7 +198,7 @@ public sealed class CancelarTarefaCommandHandlerTests
         repositorio.UltimoTokenConsulta.Should()
             .Be(cancellationToken);
 
-        repositorio.UltimoTokenAtualizacao.Should()
+        unitOfWork.UltimoTokenCommit.Should()
             .Be(cancellationToken);
     }
 
@@ -183,7 +212,11 @@ public sealed class CancelarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         var repositorio = new FakeTarefaRepository(tarefa);
-        var handler = new CancelarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CancelarTarefaCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new CancelarTarefaCommand(tarefa.Id);
 
@@ -198,15 +231,14 @@ public sealed class CancelarTarefaCommandHandlerTests
 
 }
 
-internal sealed class FakeTarefaRepository : ITarefaRepository
+internal class FakeTarefaRepository : ITarefaRepository
 {
     private readonly Tarefa _tarefa;
 
-    public int QuantidadeDeAtualizacoes { get; private set; }
-    public bool DeveFalharAoAtualizar { get; set; }
     public bool DeveFalharAoConsultar { get; set; }
+
     public CancellationToken UltimoTokenConsulta { get; private set; }
-    public CancellationToken UltimoTokenAtualizacao { get; private set; }
+
     public Guid UltimoIdConsultado { get; private set; }
 
     public FakeTarefaRepository(Tarefa tarefa)
@@ -215,7 +247,7 @@ internal sealed class FakeTarefaRepository : ITarefaRepository
     }
 
     public Task<Tarefa?> ObterTarefaPorIdAsync(
-        Guid tarefaId, 
+        Guid tarefaId,
         CancellationToken cancellationToken = default)
     {
         UltimoTokenConsulta = cancellationToken;
@@ -232,30 +264,11 @@ internal sealed class FakeTarefaRepository : ITarefaRepository
             tarefaId == _tarefa.Id ? _tarefa : null);
     }
 
-
     public Task AdicionarAsync(
-        Tarefa tarefa, 
+        Tarefa tarefa,
         CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
-
-    public Task AtualizarAsync(
-        Tarefa tarefa, 
-        CancellationToken cancellationToken = default)
-    {
-        UltimoTokenAtualizacao = cancellationToken;
-
-        QuantidadeDeAtualizacoes++;
-
-        if (DeveFalharAoAtualizar)
-        {
-            throw new InvalidOperationException(
-                "Falha simulada ao atualizar tarefa");
-        }
-
-        return Task.CompletedTask;
-    }
-
 }
 

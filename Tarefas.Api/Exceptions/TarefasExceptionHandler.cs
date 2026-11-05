@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Tarefas.Application.Exceptions;
 using Tarefas.Domain.Common.Eexceptions;
 
 namespace Tarefas.Api.Exceptions;
@@ -21,11 +22,14 @@ public sealed class TarefasExceptionHandler : IExceptionHandler
     {
         var (status, titulo) = exception switch
         {
+            NotFoundException =>
+                (404, "Recurso não encontrado"),
+
             DomainException =>
                 (422, "Regra de negócio violada"),
 
             InvalidOperationException =>
-                (404, "Recurso não encontrado"),
+                (409, "Operação não permitida"),
 
             ArgumentException =>
                 (400, "Requisição inválida"),

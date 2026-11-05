@@ -12,8 +12,5 @@ public interface ITarefaRepository
         Tarefa tarefa, 
         CancellationToken cancellationToken = default);
 
-    Task AtualizarAsync(
-        Tarefa tarefa, 
-        CancellationToken cancellationToken = default);
 }
 

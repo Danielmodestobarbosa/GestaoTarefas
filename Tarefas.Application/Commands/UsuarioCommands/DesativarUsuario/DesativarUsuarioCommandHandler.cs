@@ -7,10 +7,14 @@ public sealed class DesativarUsuarioCommandHandler
     : IRequestHandler<DesativarUsuarioCommand, DesativarUsuarioResultDto>
 {
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DesativarUsuarioCommandHandler(IUsuarioRepository usuarioRepository)
+    public DesativarUsuarioCommandHandler(
+        IUsuarioRepository usuarioRepository, 
+        IUnitOfWork unitOfWork)
     {
-        this._usuarioRepository = usuarioRepository;
+        _usuarioRepository = usuarioRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<DesativarUsuarioResultDto> Handle (
@@ -29,9 +33,7 @@ public sealed class DesativarUsuarioCommandHandler
 
         usuario.DesativarPerfil();
 
-        await _usuarioRepository.AtualizarAsync(
-            usuario,
-            cancellationToken);
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return new DesativarUsuarioResultDto(
             usuario.Id,

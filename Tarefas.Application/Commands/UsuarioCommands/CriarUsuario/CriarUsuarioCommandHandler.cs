@@ -8,10 +8,14 @@ public sealed class CriarUsuarioCommandHandler
     : IRequestHandler<CriarUsuarioCommand, CriarUsuarioResultDto>
 {
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CriarUsuarioCommandHandler(IUsuarioRepository usuarioRepository)
+    public CriarUsuarioCommandHandler(
+        IUsuarioRepository usuarioRepository, 
+        IUnitOfWork unitOfWork)
     {
         _usuarioRepository = usuarioRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<CriarUsuarioResultDto> Handle(
@@ -25,6 +29,8 @@ public sealed class CriarUsuarioCommandHandler
         await _usuarioRepository.AdicionarAsync(
             usuario,
             cancellationToken);
+
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return new CriarUsuarioResultDto(
             usuario.Id,

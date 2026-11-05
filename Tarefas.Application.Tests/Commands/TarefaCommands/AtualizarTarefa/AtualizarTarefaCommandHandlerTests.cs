@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
+using Tarefas.Application.Tests.Fakes;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
 
@@ -13,13 +14,18 @@ public sealed class AtualizarTarefaCommandHandlerTests
     [Fact(DisplayName = "Deve atualizar uma tarefa quando encontrada")]
     public async Task Deve_Atualizar_Tarefa_Quando_Encontrada()
     {
+        // Arrange
         var tarefa = new Tarefa(
             "Titulo antigo",
             "Descricao antiga",
             PrioridadeTarefa.Alta);
 
         var repositorio = new FakeTarefaRepository(tarefa);
-        var handler = new AtualizarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarTarefaCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarTarefaCommand(
             tarefa.Id,
@@ -27,16 +33,16 @@ public sealed class AtualizarTarefaCommandHandlerTests
             "Nova descricao",
             PrioridadeTarefa.Media);
 
-        //Act
+        // Act
         var resultado = await handler.Handle(command);
 
-        //Assert
+        // Assert
         resultado.TarefaId.Should().Be(tarefa.Id);
         resultado.Titulo.Should().Be("Novo titulo");
         resultado.Descricao.Should().Be("Nova descricao");
         resultado.Prioridade.Should().Be(PrioridadeTarefa.Media);
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
     #endregion
@@ -46,13 +52,18 @@ public sealed class AtualizarTarefaCommandHandlerTests
     [Fact(DisplayName = "Deve lançar erro quando a tarefa não for encontrada")]
     public async Task Deve_Retornar_Erro_Quando_Tarefa_Nao_Encontrada()
     {
+        // Arrange
         var tarefa = new Tarefa(
             "Titulo antigo",
             "Descricao antiga",
             PrioridadeTarefa.Alta);
 
         var repositorio = new FakeTarefaRepository(tarefa);
-        var handler = new AtualizarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarTarefaCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarTarefaCommand(
             Guid.NewGuid(),
@@ -60,16 +71,17 @@ public sealed class AtualizarTarefaCommandHandlerTests
             "Nova descricao",
             PrioridadeTarefa.Media);
 
-        //Act
-        var acao = async () => await handler.Handle(command, CancellationToken.None);
+        // Act
+        var acao = async () => await handler.Handle(
+            command,
+            CancellationToken.None);
 
-        //Assert
+        // Assert
         await acao.Should()
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Tarefa não encontrada");
 
-        //Já valida que o repositório não será atualizado
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
 
@@ -82,12 +94,17 @@ public sealed class AtualizarTarefaCommandHandlerTests
             "Descrição antiga",
             PrioridadeTarefa.Baixa);
 
-        var repositorio = new FakeTarefaRepository(tarefa)
+        var repositorio = new FakeTarefaRepository(tarefa);
+
+        var unitOfWork = new FakeUnitOfWork
         {
-            DeveFalharAoAtualizar = true
+            ExcecaoAoCommit = new InvalidOperationException(
+                "Falha simulada ao atualizar tarefa")
         };
 
-        var handler = new AtualizarTarefaCommandHandler(repositorio);
+        var handler = new AtualizarTarefaCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarTarefaCommand(
             tarefa.Id,
@@ -96,12 +113,16 @@ public sealed class AtualizarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         // Act
-        var act = async () => await handler.Handle(command);
+        var act = async () => await handler.Handle(
+            command,
+            CancellationToken.None);
 
         // Assert
         await act.Should()
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Falha simulada ao atualizar tarefa");
+
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
     [Fact(DisplayName = "Deve propagar exceção quando a consulta falhar")]
@@ -118,7 +139,11 @@ public sealed class AtualizarTarefaCommandHandlerTests
             DeveFalharAoConsultar = true
         };
 
-        var handler = new AtualizarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarTarefaCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarTarefaCommand(
             tarefa.Id,
@@ -127,14 +152,16 @@ public sealed class AtualizarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         // Act
-        var act = async () => await handler.Handle(command);
+        var act = async () => await handler.Handle(
+            command,
+            CancellationToken.None);
 
         // Assert
         await act.Should()
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Falha simulada ao consultar tarefa");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
     [Fact(DisplayName = "Deve encaminhar o CancellationToken ao repositório")]
@@ -147,7 +174,11 @@ public sealed class AtualizarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         var repositorio = new FakeTarefaRepository(tarefa);
-        var handler = new AtualizarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarTarefaCommandHandler(
+            repositorio, 
+            unitOfWork);
 
         var command = new AtualizarTarefaCommand(
             tarefa.Id,
@@ -165,7 +196,7 @@ public sealed class AtualizarTarefaCommandHandlerTests
         repositorio.UltimoTokenConsulta.Should()
             .Be(cancellationToken);
 
-        repositorio.UltimoTokenAtualizacao.Should()
+        unitOfWork.UltimoTokenCommit.Should()
             .Be(cancellationToken);
     }
 
@@ -180,7 +211,11 @@ public sealed class AtualizarTarefaCommandHandlerTests
             PrioridadeTarefa.Alta);
 
         var repositorio = new FakeTarefaRepository(tarefa);
-        var handler = new AtualizarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarTarefaCommandHandler(
+            repositorio, 
+            unitOfWork);
 
         var command = new AtualizarTarefaCommand(
             tarefa.Id,
@@ -202,11 +237,10 @@ internal class FakeTarefaRepository : ITarefaRepository
 {
     private readonly Tarefa _tarefa;
 
-    public bool DeveFalharAoAtualizar { get; set; }
     public bool DeveFalharAoConsultar { get; set; }
+
     public CancellationToken UltimoTokenConsulta { get; private set; }
-    public CancellationToken UltimoTokenAtualizacao { get; private set; }
-    public int QuantidadeDeAtualizacoes { get; private set; }
+
     public Guid UltimoIdConsultado { get; private set; }
 
     public FakeTarefaRepository(Tarefa tarefa)
@@ -215,8 +249,8 @@ internal class FakeTarefaRepository : ITarefaRepository
     }
 
     public Task<Tarefa?> ObterTarefaPorIdAsync(
-        Guid tarefaId, CancellationToken
-        cancellationToken = default)
+        Guid tarefaId,
+        CancellationToken cancellationToken = default)
     {
         UltimoTokenConsulta = cancellationToken;
 
@@ -233,27 +267,10 @@ internal class FakeTarefaRepository : ITarefaRepository
     }
 
     public Task AdicionarAsync(
-        Tarefa tarefa, 
+        Tarefa tarefa,
         CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
-
-    public Task AtualizarAsync(
-        Tarefa tarefa, 
-        CancellationToken cancellationToken = default)
-    {
-        UltimoTokenAtualizacao = cancellationToken;
-
-        if (DeveFalharAoAtualizar)
-        {
-            throw new InvalidOperationException(
-                "Falha simulada ao atualizar tarefa");
-        }
-
-        QuantidadeDeAtualizacoes++;
-        return Task.CompletedTask;
-    }
-
 }
 
