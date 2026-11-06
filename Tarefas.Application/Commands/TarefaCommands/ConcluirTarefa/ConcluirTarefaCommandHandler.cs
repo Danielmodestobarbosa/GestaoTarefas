@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Exceptions;
 
 namespace Tarefas.Application.Commands.TarefaCommands.ConcluirTarefa;
 
@@ -27,7 +28,7 @@ public sealed class ConcluirTarefaCommandHandler
 
         if(tarefa is null)
         {
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 "Tarefa não encontrada");
         }
 

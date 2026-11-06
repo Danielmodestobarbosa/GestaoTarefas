@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Exceptions;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.AtivarUsuario;
 
@@ -27,7 +28,8 @@ public sealed class AtivarUsuarioCommandHandler
 
         if(usuario is null)
         {
-            throw new InvalidOperationException("Usuario não encontrado");
+            throw new NotFoundException(
+                "Usuario não encontrado");
         }
 
         usuario.AtivarUsuario();

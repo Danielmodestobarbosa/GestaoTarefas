@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.IniciarTarefa;
+using Tarefas.Application.Exceptions;
 using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
@@ -62,7 +63,7 @@ public sealed class IniciarTarefaCommandHandlerTests
 
         // Assert
         await act.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<NotFoundException>()
             .WithMessage("Tarefa não encontrada");
 
         unitOfWork.QuantidadeDeCommits.Should().Be(0);

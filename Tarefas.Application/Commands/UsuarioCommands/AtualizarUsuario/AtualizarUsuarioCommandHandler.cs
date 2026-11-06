@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Exceptions;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.AtualizarUsuario;
 
@@ -27,7 +28,7 @@ public sealed class AtualizarUsuarioCommandHandler
 
         if(usuario is null)
         {
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 "Usuario não encontrado");
         }
 

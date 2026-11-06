@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Exceptions;
 using Tarefas.Domain.Usuarios.Enums;
 
 namespace Tarefas.Application.Commands.TarefaCommands.AtribuirUsuarioTarefa;
@@ -31,7 +32,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandler
 
         if (tarefa is null)
         {
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 "Tarefa não encontrada");
         }
 
@@ -41,13 +42,13 @@ public sealed class AtribuirUsuarioTarefaCommandHandler
 
         if (usuario is null)
         {
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 "Usuário não encontrado");
         }
 
         if (usuario.Status != StatusUsuario.Ativo)
         {
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 "Não é possível atribuir uma tarefa a um usuário inativo");
         }
 

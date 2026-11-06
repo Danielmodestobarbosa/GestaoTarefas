@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
+using Tarefas.Application.Exceptions;
 using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
@@ -78,7 +79,7 @@ public sealed class AtualizarTarefaCommandHandlerTests
 
         // Assert
         await acao.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<NotFoundException>()
             .WithMessage("Tarefa não encontrada");
 
         unitOfWork.QuantidadeDeCommits.Should().Be(0);

@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Exceptions;
 
 namespace Tarefas.Application.Commands.TarefaCommands.IniciarTarefa;
 
@@ -27,7 +28,8 @@ public sealed class IniciarTarefaCommandHandler
 
         if (tarefa is null)
         {
-            throw new InvalidOperationException("Tarefa não encontrada");
+            throw new NotFoundException(
+                "Tarefa não encontrada");
         }
 
         tarefa.Iniciar();

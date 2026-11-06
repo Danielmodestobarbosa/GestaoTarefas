@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Exceptions;
 
 namespace Tarefas.Application.Commands.UsuarioCommands.DesativarUsuario;
 
@@ -27,7 +28,7 @@ public sealed class DesativarUsuarioCommandHandler
 
         if(usuario is null)
         {
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 "Usuario não encontrado");
         }
 

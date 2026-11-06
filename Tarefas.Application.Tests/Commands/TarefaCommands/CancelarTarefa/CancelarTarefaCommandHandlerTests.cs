@@ -3,6 +3,7 @@ using System.Runtime.InteropServices.Marshalling;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
 using Tarefas.Application.Commands.TarefaCommands.CancelarTarefa;
+using Tarefas.Application.Exceptions;
 using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Common.Eexceptions;
 using Tarefas.Domain.Tarefas.Entities;
@@ -66,7 +67,7 @@ public sealed class CancelarTarefaCommandHandlerTests
 
         //Assert
         await acao.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<NotFoundException>()
             .WithMessage("Tarefa não encontrada");
 
         unitOfWork.QuantidadeDeCommits.Should().Be(0);
