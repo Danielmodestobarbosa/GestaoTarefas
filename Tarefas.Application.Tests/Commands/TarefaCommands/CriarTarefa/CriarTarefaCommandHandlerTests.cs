@@ -1,9 +1,7 @@
 ﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.CriarTarefa;
+using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
 
@@ -18,7 +16,11 @@ public sealed class CriarTarefaCommandHandlerTests
     {
         //Arrange
         var repositorio = new FakeTarefaRepository();
-        var handler = new CriarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarTarefaCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new CriarTarefaCommand(
             "Estudar C#",
@@ -36,6 +38,7 @@ public sealed class CriarTarefaCommandHandlerTests
 
         repositorio.QuantidadeDeAdicoes.Should().Be(1);
         repositorio.UltimaTarefaAdicionada.Should().NotBeNull();
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
 
@@ -48,7 +51,11 @@ public sealed class CriarTarefaCommandHandlerTests
             DeveFalharAoAdicionar = true
         };
 
-        var handler = new CriarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarTarefaCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new CriarTarefaCommand(
             "Estudar C#",
@@ -64,6 +71,7 @@ public sealed class CriarTarefaCommandHandlerTests
             .WithMessage("Falha simulada ao adicionar tarefa");
 
         repositorio.QuantidadeDeAdicoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
     [Fact(DisplayName = "Deve encaminhar o CancellationToken ao repositório")]
@@ -71,7 +79,11 @@ public sealed class CriarTarefaCommandHandlerTests
     {
         // Arrange
         var repositorio = new FakeTarefaRepository();
-        var handler = new CriarTarefaCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarTarefaCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new CriarTarefaCommand(
             "Estudar C#",
@@ -87,27 +99,57 @@ public sealed class CriarTarefaCommandHandlerTests
         // Assert
         repositorio.UltimoTokenAdicao.Should()
             .Be(cancellationToken);
+
+        unitOfWork.UltimoTokenCommit.Should()
+            .Be(cancellationToken);
     }
 
     #endregion
 }
 
+
 internal sealed class FakeTarefaRepository : ITarefaRepository
 {
+    private readonly Tarefa? _tarefa;
+
     public Tarefa? UltimaTarefaAdicionada { get; private set; }
+
     public int QuantidadeDeAdicoes { get; private set; }
+
     public bool DeveFalharAoAdicionar { get; set; }
+
+    public bool DeveFalharAoConsultar { get; set; }
+
     public CancellationToken UltimoTokenAdicao { get; private set; }
 
+    public CancellationToken UltimoTokenConsulta { get; private set; }
+
+    public Guid UltimoIdConsultado { get; private set; }
+
+    public FakeTarefaRepository(Tarefa? tarefa = null)
+    {
+        _tarefa = tarefa;
+    }
+
     public Task<Tarefa?> ObterTarefaPorIdAsync(
-        Guid tarefaId, 
+        Guid tarefaId,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        UltimoTokenConsulta = cancellationToken;
+        UltimoIdConsultado = tarefaId;
+
+        if (DeveFalharAoConsultar)
+        {
+            throw new InvalidOperationException(
+                "Falha simulada ao consultar tarefa");
+        }
+
+        return Task.FromResult<Tarefa?>(
+            _tarefa?.Id == tarefaId ? _tarefa : null);
     }
 
     public Task AdicionarAsync(
-        Tarefa tarefa, 
+        Tarefa tarefa,
         CancellationToken cancellationToken = default)
     {
         UltimoTokenAdicao = cancellationToken;
@@ -123,11 +165,5 @@ internal sealed class FakeTarefaRepository : ITarefaRepository
 
         return Task.CompletedTask;
     }
-
-    public Task AtualizarAsync(
-        Tarefa tarefa, 
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
 }
+

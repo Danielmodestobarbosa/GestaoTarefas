@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.UsuarioCommands.AtualizarUsuario;
+using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Common.Eexceptions;
+using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Usuarios.Entities;
 using Tarefas.Domain.Usuarios.Enums;
 using Tarefas.Domain.Usuarios.ValueObjects;
@@ -24,7 +26,11 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
         var novoEmail = new Email("daniel.barbosa@hotmail.com");
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new AtualizarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarUsuarioCommand(
             usuario.Id,
@@ -40,7 +46,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
         resultado.Email.Endereco.Should().Be("daniel.barbosa@hotmail.com");
         resultado.Status.Should().Be(StatusUsuario.Ativo);
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
 
@@ -53,7 +59,11 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             new Email("daniel@hotmail.com"));
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new AtualizarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarUsuarioCommand(
             Guid.NewGuid(),
@@ -68,7 +78,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Usuario não encontrado");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
     [Fact(DisplayName = "Deve propagar exceção quando falhar ao atualizar")]
@@ -79,12 +89,16 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             new NomeUsuario("Daniel Modesto"),
             new Email("daniel@hotmail.com"));
 
-        var repositorio = new FakeUsuarioRepository(usuario)
+        var repositorio = new FakeUsuarioRepository(usuario);
+        var unitOfWork = new FakeUnitOfWork
         {
-            DeveFalharAoAtualizar = true
+            ExcecaoAoCommit = new InvalidOperationException(
+                "Falha simulada ao atualizar usuário")
         };
 
-        var handler = new AtualizarUsuarioCommandHandler(repositorio);
+        var handler = new AtualizarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarUsuarioCommand(
             usuario.Id,
@@ -99,7 +113,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Falha simulada ao atualizar usuário");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
     [Fact(DisplayName = "Deve propagar exceção quando falhar ao consultar")]
@@ -115,7 +129,11 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             DeveFalharAoConsultar = true
         };
 
-        var handler = new AtualizarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarUsuarioCommand(
             usuario.Id,
@@ -130,7 +148,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Falha simulada ao consultar usuário");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
 
@@ -145,7 +163,11 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
         usuario.DesativarPerfil();
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new AtualizarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarUsuarioCommand(
             usuario.Id,
@@ -160,7 +182,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             .ThrowAsync<DomainException>()
             .WithMessage("Usuários inativos não podem ter o perfil atualizado");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
 
@@ -173,7 +195,11 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             new Email("daniel@hotmail.com"));
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new AtualizarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         var command = new AtualizarUsuarioCommand(
             usuario.Id,
@@ -188,7 +214,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
 
         // Assert
         repositorio.UltimoTokenConsulta.Should().Be(cancellationToken);
-        repositorio.UltimoTokenAtualizacao.Should().Be(cancellationToken);
+        unitOfWork.UltimoTokenCommit.Should().Be(cancellationToken);
     }
 
     [Fact(DisplayName = "Deve consultar usando o ID correto do usuário")]
@@ -200,7 +226,12 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
             new Email("daniel@hotmail.com"));
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new AtualizarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtualizarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork
+            );
 
         var command = new AtualizarUsuarioCommand(
             usuario.Id,
@@ -218,14 +249,14 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
     #endregion
 }
 
-internal sealed class FakeUsuarioRepository : IUsuarioRepository
+internal class FakeUsuarioRepository : IUsuarioRepository
 {
     private readonly Usuario _usuario;
-    public int QuantidadeDeAtualizacoes { get; private set; }
+
     public bool DeveFalharAoConsultar { get; set; }
-    public bool DeveFalharAoAtualizar { get; set; }
+
     public CancellationToken UltimoTokenConsulta { get; private set; }
-    public CancellationToken UltimoTokenAtualizacao { get; private set; }
+
     public Guid UltimoIdConsultado { get; private set; }
 
     public FakeUsuarioRepository(Usuario usuario)
@@ -234,39 +265,28 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
     }
 
     public Task<Usuario?> ObterUsuarioPorIdAsync(
-        Guid usuarioId, 
+        Guid usuarioId,
         CancellationToken cancellationToken = default)
     {
-        UltimoIdConsultado = usuarioId;
         UltimoTokenConsulta = cancellationToken;
 
+        UltimoIdConsultado = usuarioId;
+
         if (DeveFalharAoConsultar)
+        {
             throw new InvalidOperationException(
                 "Falha simulada ao consultar usuário");
+        }
 
         return Task.FromResult<Usuario?>(
             usuarioId == _usuario.Id ? _usuario : null);
     }
 
     public Task AdicionarAsync(
-        Usuario usuario, 
+        Usuario usuario,
         CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
-    }
-
-    public Task AtualizarAsync(
-        Usuario usuario, 
-        CancellationToken cancellationToken = default)
-    {
-        UltimoTokenAtualizacao = cancellationToken;
-        QuantidadeDeAtualizacoes++;
-
-        if (DeveFalharAoAtualizar)
-            throw new InvalidOperationException(
-                "Falha simulada ao atualizar usuário");
-
-        return Task.CompletedTask;
     }
 }
 

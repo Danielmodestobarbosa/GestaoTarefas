@@ -1,6 +1,6 @@
 ﻿using Tarefas.Application.Abstractions.Persistence;
 
-namespace Tarefas.Application.Tests.Fakes;
+namespace Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 
 internal sealed class FakeUnitOfWork : IUnitOfWork
 {

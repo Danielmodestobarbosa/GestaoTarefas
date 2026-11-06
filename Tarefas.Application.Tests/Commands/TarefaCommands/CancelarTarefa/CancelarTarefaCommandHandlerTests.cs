@@ -3,7 +3,7 @@ using System.Runtime.InteropServices.Marshalling;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
 using Tarefas.Application.Commands.TarefaCommands.CancelarTarefa;
-using Tarefas.Application.Tests.Fakes;
+using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Common.Eexceptions;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;

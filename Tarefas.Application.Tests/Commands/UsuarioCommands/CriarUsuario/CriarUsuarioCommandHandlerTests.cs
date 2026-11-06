@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.UsuarioCommands.CriarUsuario;
+using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Usuarios.Entities;
 using Tarefas.Domain.Usuarios.Enums;
@@ -23,7 +24,11 @@ public sealed class CriarUsuarioCommandHandlerTests
         var command = new CriarUsuarioCommand(nome, email);
 
         var repositorio = new FakeUsuarioRepository();
-        var handler = new CriarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -38,6 +43,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         repositorio.UsuarioAdicionado.Should().NotBeNull();
         repositorio.UsuarioAdicionado!.Id.Should().Be(resultado.UsuarioId);
         repositorio.QuantidadeDeAdicoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
 
@@ -51,13 +57,18 @@ public sealed class CriarUsuarioCommandHandlerTests
         var command = new CriarUsuarioCommand(nome, email);
 
         var repositorio = new FakeUsuarioRepository();
-        var handler = new CriarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         await handler.Handle(command);
 
         // Assert
         repositorio.QuantidadeDeAdicoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
 
@@ -74,7 +85,11 @@ public sealed class CriarUsuarioCommandHandlerTests
         var cancellationToken = cancellationTokenSource.Token;
 
         var repositorio = new FakeUsuarioRepository();
-        var handler = new CriarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         await handler.Handle(command, cancellationToken);
@@ -94,7 +109,11 @@ public sealed class CriarUsuarioCommandHandlerTests
         var command = new CriarUsuarioCommand(nome, email);
 
         var repositorio = new FakeUsuarioRepository();
-        var handler = new CriarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -123,7 +142,10 @@ public sealed class CriarUsuarioCommandHandlerTests
             DeveFalharAoAdicionar = true
         };
 
-        var handler = new CriarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var acao = async () => await handler.Handle(command);
@@ -131,10 +153,10 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Assert
         await acao.Should()
             .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Falha simulada ao adicionar usuario");
+            .WithMessage("Falha simulada ao adicionar usuário");
 
         repositorio.QuantidadeDeAdicoes.Should().Be(1);
-        repositorio.UsuarioAdicionado.Should().BeNull();
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
 
@@ -148,7 +170,11 @@ public sealed class CriarUsuarioCommandHandlerTests
         var command = new CriarUsuarioCommand(nome, email);
 
         var repositorio = new FakeUsuarioRepository();
-        var handler = new CriarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -159,6 +185,7 @@ public sealed class CriarUsuarioCommandHandlerTests
 
         repositorio.UsuarioAdicionado!.Nome.Should().Be(nome);
         repositorio.UsuarioAdicionado.Email.Should().Be(email);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
 
@@ -172,7 +199,11 @@ public sealed class CriarUsuarioCommandHandlerTests
         var command = new CriarUsuarioCommand(nome, email);
 
         var repositorio = new FakeUsuarioRepository();
-        var handler = new CriarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -180,6 +211,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Assert
         resultado.Status.Should().Be(StatusUsuario.Ativo);
         repositorio.UsuarioAdicionado!.Status.Should().Be(StatusUsuario.Ativo);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
 
@@ -193,7 +225,11 @@ public sealed class CriarUsuarioCommandHandlerTests
         var command = new CriarUsuarioCommand(nome, email);
 
         var repositorio = new FakeUsuarioRepository();
-        var handler = new CriarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -201,6 +237,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Assert
         resultado.UsuarioId.Should().NotBe(Guid.Empty);
         repositorio.UsuarioAdicionado!.Id.Should().NotBe(Guid.Empty);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
 
@@ -218,7 +255,10 @@ public sealed class CriarUsuarioCommandHandlerTests
             DeveFalharAoAdicionar = true
         };
 
-        var handler = new CriarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var acao = async () => await handler.Handle(command);
@@ -227,7 +267,7 @@ public sealed class CriarUsuarioCommandHandlerTests
         await acao.Should()
             .ThrowAsync<InvalidOperationException>();
 
-        repositorio.UsuarioAdicionado.Should().BeNull();
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
 
@@ -236,16 +276,42 @@ public sealed class CriarUsuarioCommandHandlerTests
 
 internal sealed class FakeUsuarioRepository : IUsuarioRepository
 {
+    private readonly Usuario? _usuario;
+
     public Usuario? UsuarioAdicionado { get; private set; }
+
     public int QuantidadeDeAdicoes { get; private set; }
-    public CancellationToken UltimoTokenAdicao { get; private set; }
+
     public bool DeveFalharAoAdicionar { get; set; }
+
+    public bool DeveFalharAoConsultar { get; set; }
+
+    public CancellationToken UltimoTokenAdicao { get; private set; }
+
+    public CancellationToken UltimoTokenConsulta { get; private set; }
+
+    public Guid UltimoIdConsultado { get; private set; }
+
+    public FakeUsuarioRepository(Usuario? usuario  = null)
+    {
+        _usuario = usuario;
+    }
 
     public Task<Usuario?> ObterUsuarioPorIdAsync(
         Guid usuarioId,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<Usuario?>(null);
+        UltimoTokenConsulta = cancellationToken;
+        UltimoIdConsultado = usuarioId;
+
+        if (DeveFalharAoConsultar)
+        {
+            throw new InvalidOperationException(
+                "Falha simulada ao consultar usuário");
+        }
+
+        return Task.FromResult<Usuario?>(
+            _usuario?.Id == usuarioId ? _usuario : null);
     }
 
     public Task AdicionarAsync(
@@ -253,24 +319,17 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
         CancellationToken cancellationToken = default)
     {
         UltimoTokenAdicao = cancellationToken;
+
         QuantidadeDeAdicoes++;
+        UsuarioAdicionado = usuario;
 
         if (DeveFalharAoAdicionar)
         {
             throw new InvalidOperationException(
-                "Falha simulada ao adicionar usuario");
+                "Falha simulada ao adicionar usuário");
         }
 
-        UsuarioAdicionado = usuario;
-
         return Task.CompletedTask;
-    }
-
-    public Task AtualizarAsync(
-        Usuario usuario,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
     }
 }
 

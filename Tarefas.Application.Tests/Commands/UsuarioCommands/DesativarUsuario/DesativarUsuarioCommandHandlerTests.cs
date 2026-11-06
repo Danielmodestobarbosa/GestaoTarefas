@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Text;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.UsuarioCommands.DesativarUsuario;
+using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Usuarios.Entities;
 using Tarefas.Domain.Usuarios.Enums;
 using Tarefas.Domain.Usuarios.ValueObjects;
 
 namespace Tarefas.Application.Tests.Commands.UsuarioCommands.DesativarUsuario;
 
-public sealed class DesatiarUsuarioCommandHandlerTests
+public sealed class DesativarUsuarioCommandHandlerTests
 {
     #region Testes de desativação do usuário
 
@@ -26,7 +27,11 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         var command = new DesativarUsuarioCommand(usuario.Id);
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new DesativarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new DesativarUsuarioCommandHandler(
+            repositorio, 
+            unitOfWork);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -38,8 +43,7 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         resultado.Email.Should().Be(email);
         resultado.Status.Should().Be(StatusUsuario.Inativo);
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(1);
-        repositorio.UsuarioAtualizado.Should().BeSameAs(usuario);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
 
@@ -52,7 +56,11 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         var command = new DesativarUsuarioCommand(usuarioId);
 
         var repositorio = new FakeUsuarioRepository(null);
-        var handler = new DesativarUsuarioCommandHandler(repositorio);
+
+        var unitOfWork = new FakeUnitOfWork();
+        var handler = new DesativarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var acao = async () => await handler.Handle(command);
@@ -63,7 +71,7 @@ public sealed class DesatiarUsuarioCommandHandlerTests
             .WithMessage("Usuario não encontrado");
 
         repositorio.UltimoIdConsultado.Should().Be(usuarioId);
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
 
@@ -82,7 +90,11 @@ public sealed class DesatiarUsuarioCommandHandlerTests
             DeveFalharAoConsultar = true
         };
 
-        var handler = new DesativarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new DesativarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var acao = async () => await handler.Handle(command);
@@ -90,9 +102,9 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         // Assert
         await acao.Should()
             .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Falha simulada ao consultar usuario");
+            .WithMessage("Falha simulada ao consultar usuário");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(0);
+        unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
 
@@ -110,14 +122,18 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         var cancellationToken = cancellationTokenSource.Token;
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new DesativarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new DesativarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         await handler.Handle(command, cancellationToken);
 
         // Assert
         repositorio.UltimoTokenConsulta.Should().Be(cancellationToken);
-        repositorio.UltimoTokenAtualizacao.Should().Be(cancellationToken);
+        unitOfWork.UltimoTokenCommit.Should().Be(cancellationToken);
     }
 
 
@@ -132,7 +148,11 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         var command = new DesativarUsuarioCommand(usuario.Id);
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new DesativarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new DesativarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         await handler.Handle(command);
@@ -152,12 +172,16 @@ public sealed class DesatiarUsuarioCommandHandlerTests
 
         var command = new DesativarUsuarioCommand(usuario.Id);
 
-        var repositorio = new FakeUsuarioRepository(usuario)
+        var repositorio = new FakeUsuarioRepository(usuario);
+        var unitOfWork = new FakeUnitOfWork
         {
-            DeveFalharAoAtualizar = true
+            ExcecaoAoCommit = new InvalidOperationException(
+                "Falha simulada ao atualizar usuário")
         };
 
-        var handler = new DesativarUsuarioCommandHandler(repositorio);
+        var handler = new DesativarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var acao = async () => await handler.Handle(command);
@@ -165,11 +189,10 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         // Assert
         await acao.Should()
             .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Falha simulada ao atualizar usuario");
+            .WithMessage("Falha simulada ao atualizar usuário");
 
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
         usuario.Status.Should().Be(StatusUsuario.Inativo);
-        repositorio.UsuarioAtualizado.Should().BeNull();
     }
 
 
@@ -185,7 +208,11 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         var command = new DesativarUsuarioCommand(usuario.Id);
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new DesativarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new DesativarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -195,8 +222,8 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         resultado.Nome.Should().Be(nome);
         resultado.Email.Should().Be(email);
 
-        repositorio.UsuarioAtualizado!.Nome.Should().Be(nome);
-        repositorio.UsuarioAtualizado.Email.Should().Be(email);
+        usuario.Nome.Should().Be(nome);
+        usuario.Email.Should().Be(email);
     }
 
 
@@ -211,14 +238,18 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         var command = new DesativarUsuarioCommand(usuario.Id);
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new DesativarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new DesativarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         var resultado = await handler.Handle(command);
 
         // Assert
         resultado.Status.Should().Be(StatusUsuario.Inativo);
-        repositorio.UsuarioAtualizado!.Status.Should().Be(StatusUsuario.Inativo);
+        usuario.Status.Should().Be(StatusUsuario.Inativo);
     }
 
 
@@ -233,13 +264,17 @@ public sealed class DesatiarUsuarioCommandHandlerTests
         var command = new DesativarUsuarioCommand(usuario.Id);
 
         var repositorio = new FakeUsuarioRepository(usuario);
-        var handler = new DesativarUsuarioCommandHandler(repositorio);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new DesativarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork);
 
         // Act
         await handler.Handle(command);
 
         // Assert
-        repositorio.QuantidadeDeAtualizacoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
     }
 
 
@@ -247,23 +282,16 @@ public sealed class DesatiarUsuarioCommandHandlerTests
 }
 internal sealed class FakeUsuarioRepository : IUsuarioRepository
 {
-    private readonly Usuario? _usuario;
-
-    public int QuantidadeDeAtualizacoes { get; private set; }
+    private readonly Usuario _usuario;
 
     public bool DeveFalharAoConsultar { get; set; }
 
-    public bool DeveFalharAoAtualizar { get; set; }
-
-    public Guid UltimoIdConsultado { get; private set; }
-
     public CancellationToken UltimoTokenConsulta { get; private set; }
 
-    public CancellationToken UltimoTokenAtualizacao { get; private set; }
-
+    public Guid UltimoIdConsultado { get; private set; }
     public Usuario? UsuarioAtualizado { get; private set; }
 
-    public FakeUsuarioRepository(Usuario? usuario)
+    public FakeUsuarioRepository(Usuario? usuario = null)
     {
         _usuario = usuario;
     }
@@ -276,10 +304,8 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
         UltimoTokenConsulta = cancellationToken;
 
         if (DeveFalharAoConsultar)
-        {
             throw new InvalidOperationException(
-                "Falha simulada ao consultar usuario");
-        }
+                "Falha simulada ao consultar usuário");
 
         return Task.FromResult<Usuario?>(
             _usuario?.Id == usuarioId ? _usuario : null);
@@ -290,23 +316,5 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
         CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
-    }
-
-    public Task AtualizarAsync(
-        Usuario usuario,
-        CancellationToken cancellationToken = default)
-    {
-        UltimoTokenAtualizacao = cancellationToken;
-        QuantidadeDeAtualizacoes++;
-
-        if (DeveFalharAoAtualizar)
-        {
-            throw new InvalidOperationException(
-                "Falha simulada ao atualizar usuario");
-        }
-
-        UsuarioAtualizado = usuario;
-
-        return Task.CompletedTask;
     }
 }

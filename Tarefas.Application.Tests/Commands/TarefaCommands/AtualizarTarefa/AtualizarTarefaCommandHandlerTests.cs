@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.AtualizarTarefa;
-using Tarefas.Application.Tests.Fakes;
+using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
 
