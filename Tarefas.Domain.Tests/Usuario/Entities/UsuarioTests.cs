@@ -385,13 +385,13 @@ public class UsuarioTests
         usuario.DesativarPerfil();
 
         //Act
-        usuario.ReativarUsuario();
-        usuario.ReativarUsuario();
+        usuario.AtivarUsuario();
+        usuario.AtivarUsuario();
 
         //Assert
         usuario.DomainEvents
             .Should()
-            .ContainSingle(u => u is UsuarioReativadoEvent);
+            .ContainSingle(u => u is UsuarioAtivadoEvent);
     }
 
     [Fact(DisplayName = "Deve manter a data de atualização ao ativar usuário novamente")]
@@ -419,10 +419,10 @@ public class UsuarioTests
 
     #endregion
 
-    #region Testes de Reativação do Usuário
+    #region Testes de Ativação do Usuário
 
-    [Fact(DisplayName = "Deve reativar usuário inativo")]
-    public void Deve_Reativar_Usuario_Inativo()
+    [Fact(DisplayName = "Deve ativar usuário inativo")]
+    public void Deve_Ativar_Usuario_Inativo()
     {
         //Arrange
         var nome = new NomeUsuario("Daniel Modesto");
@@ -437,46 +437,6 @@ public class UsuarioTests
 
         //Assert
         usuario.Status.Should().Be(StatusUsuario.Ativo);
-    }
-
-    [Fact(DisplayName = "Deve registrar evento ao reativar usuário")]
-    public void Deve_Registrar_Evento_Ao_Reativar_Usuario()
-    {
-        //Arrange
-        var nome = new NomeUsuario("Daniel Modesto");
-        var email = new Email("daniel@hotmail.com");
-
-        var usuario = new Usuario(nome, email);
-
-        usuario.DesativarPerfil();
-
-        //Act
-        usuario.ReativarUsuario();
-
-        //Assert
-        usuario.Status
-            .Should()
-            .Be(StatusUsuario.Ativo);
-    }
-
-    [Fact(DisplayName = "Deve alterar evento ao reativar usuário")]
-    public void Deve_Alterar_Evento_Ao_Reativar_Usuario()
-    {
-        //Arrange
-        var nome = new NomeUsuario("Daniel Modesto");
-        var email = new Email("daniel@hotmail.com");
-
-        var usuario = new Usuario(nome, email);
-
-        usuario.DesativarPerfil();
-
-        //Act
-        usuario.ReativarUsuario();
-
-        //Assert
-        usuario.DomainEvents
-            .Should()
-            .ContainSingle(u => u is UsuarioReativadoEvent);
     }
 
     #endregion

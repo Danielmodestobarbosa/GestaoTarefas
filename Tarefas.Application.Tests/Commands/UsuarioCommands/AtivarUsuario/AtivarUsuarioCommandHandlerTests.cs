@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.UsuarioCommands.AtivarUsuario;
+using Tarefas.Application.Exceptions;
 using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Usuarios.Entities;
@@ -68,7 +69,7 @@ public sealed class AtivarUsuarioCommandHandlerTests
 
         //Assert
         await acao.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<NotFoundException>()
             .WithMessage("Usuario não encontrado");
 
         unitOfWork.QuantidadeDeCommits.Should().Be(0);

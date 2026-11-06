@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.UsuarioCommands.AtualizarUsuario;
+using Tarefas.Application.Exceptions;
 using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Common.Eexceptions;
 using Tarefas.Domain.Tarefas.Entities;
@@ -75,7 +76,7 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
 
         // Assert
         await acao.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<NotFoundException>()
             .WithMessage("Usuario não encontrado");
 
         unitOfWork.QuantidadeDeCommits.Should().Be(0);

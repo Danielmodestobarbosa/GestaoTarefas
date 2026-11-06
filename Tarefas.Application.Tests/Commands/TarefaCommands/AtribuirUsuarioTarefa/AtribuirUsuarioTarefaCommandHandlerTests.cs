@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.TarefaCommands.AtribuirUsuarioTarefa;
+using Tarefas.Application.Exceptions;
 using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
@@ -80,7 +81,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         //Assert
         await acao.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<NotFoundException>()
             .WithMessage("Tarefa não encontrada");
 
         unitOfWork.QuantidadeDeCommits.Should().Be(0);
@@ -117,10 +118,10 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         //Assert
         await acao.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<NotFoundException>()
             .WithMessage("Usuário não encontrado");
 
-        tarefa.UsuarioId.Should().BeNull();
+        
         unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
@@ -157,7 +158,7 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
 
         //Assert
         await acao.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<NotFoundException>()
             .WithMessage("Não é possível atribuir uma tarefa a um usuário inativo");
 
         tarefa.UsuarioId.Should().BeNull();

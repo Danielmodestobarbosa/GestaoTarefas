@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Tarefas.Application.Abstractions.Persistence;
 using Tarefas.Application.Commands.UsuarioCommands.DesativarUsuario;
+using Tarefas.Application.Exceptions;
 using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Usuarios.Entities;
 using Tarefas.Domain.Usuarios.Enums;
@@ -67,7 +68,7 @@ public sealed class DesativarUsuarioCommandHandlerTests
 
         // Assert
         await acao.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<NotFoundException>()
             .WithMessage("Usuario não encontrado");
 
         repositorio.UltimoIdConsultado.Should().Be(usuarioId);

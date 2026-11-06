@@ -125,6 +125,10 @@ public sealed class Tarefa : AggregateRoot
         UsuarioId = usuarioId;
 
         SetDataAtualizacao();
+
+        AddDomainEvent(new UsuarioAtribuidoEvent(
+            TarefaId: Id,
+            UsuarioId: usuarioId));
     }
 
     public static void Validar(
