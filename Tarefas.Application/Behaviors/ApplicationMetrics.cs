@@ -4,6 +4,7 @@ using System.Diagnostics.Metrics;
 
 namespace Tarefas.Application.Behaviors;
 
+//responsável por coletar métricas de execução da camada Application
 public sealed class ApplicationMetrics : IDisposable
 {
     private readonly Meter _meter;
