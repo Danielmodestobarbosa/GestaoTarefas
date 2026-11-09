@@ -5,6 +5,7 @@ using Tarefas.Application.Exceptions;
 using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Tarefas.Enums;
+using Tarefas.Domain.Tarefas.Events;
 using Tarefas.Domain.Usuarios.Entities;
 using Tarefas.Domain.Usuarios.ValueObjects;
 
@@ -48,6 +49,69 @@ public sealed class AtribuirUsuarioTarefaCommandHandlerTests
         resultado.TarefaId.Should().Be(tarefa.Id);
         resultado.UsuarioId.Should().Be(usuario.Id);
         unitOfWork.QuantidadeDeCommits.Should().Be(1);
+    }
+
+    [Fact(DisplayName = "Deve gerar evento de domínio quando um usuário for atribuído")]
+    public async Task Deve_Gerar_Evento_Quando_Usuario_For_Atribuido()
+    {
+        // Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        var usuario = new Usuario(
+            new NomeUsuario("Daniel Modesto"),
+            new Email("daniel@hotmail.com"));
+
+        var tarefaRepository = new FakeTarefaCommandRepository(tarefa);
+        var usuarioRepository = new FakeUsuarioRepository(usuario);
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = new AtribuirUsuarioTarefaCommandHandler(
+            tarefaRepository,
+            usuarioRepository,
+            unitOfWork);
+
+        var command = new AtribuirUsuarioTarefaCommand(
+            tarefa.Id,
+            usuario.Id);
+
+        // Act
+        await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        var evento = tarefa.DomainEvents
+            .OfType<UsuarioAtribuidoEvent>()
+            .Single();
+
+        evento.TarefaId.Should().Be(tarefa.Id);
+        evento.UsuarioId.Should().Be(usuario.Id);
+    }
+
+    [Fact(DisplayName = "Não deve gerar novo evento ao atribuir o mesmo usuário")]
+    public void Nao_Deve_Gerar_Novo_Evento_Ao_Atribuir_Mesmo_Usuario()
+    {
+        // Arrange
+        var tarefa = new Tarefa(
+            "Estudar C#",
+            "Estudar testes unitários",
+            PrioridadeTarefa.Alta);
+
+        var usuarioId = Guid.NewGuid();
+
+        // Act
+        tarefa.AtribuirUsuario(usuarioId);
+
+        tarefa.AtribuirUsuario(usuarioId);
+
+        // Assert
+        var eventos = tarefa.DomainEvents
+            .OfType<UsuarioAtribuidoEvent>()
+            .ToList();
+
+        eventos.Should().HaveCount(1);
+        tarefa.UsuarioId.Should().Be(usuarioId);
     }
 
     [Fact(DisplayName = "Deve lançar exceção quando a tarefa não for encontrada")]

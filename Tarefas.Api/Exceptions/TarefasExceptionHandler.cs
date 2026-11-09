@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using Tarefas.Application.Exceptions;
 using Tarefas.Domain.Common.Eexceptions;
 
@@ -22,6 +23,9 @@ public sealed class TarefasExceptionHandler : IExceptionHandler
     {
         var (status, titulo) = exception switch
         {
+            ValidationException=>
+                (400, "Erro de validação"),
+
             NotFoundException =>
                 (404, "Recurso não encontrado"),
 
