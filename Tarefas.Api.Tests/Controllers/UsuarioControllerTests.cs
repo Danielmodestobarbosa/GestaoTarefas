@@ -1,5 +1,6 @@
 ﻿
 using FluentAssertions;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -9,6 +10,7 @@ using Tarefas.Api.Tests.Infrastructure;
 using Tarefas.Application.Commands.UsuarioCommands.AtivarUsuario;
 using Tarefas.Application.Commands.UsuarioCommands.CriarUsuario;
 using Tarefas.Application.Commands.UsuarioCommands.DesativarUsuario;
+using Tarefas.Application.Common.Pagination;
 using Tarefas.Application.Queries.Usuarios.DTOs;
 using Tarefas.Domain.Usuarios.Enums;
 
@@ -102,6 +104,7 @@ public sealed class UsuariosControllerTests : IDisposable
     }
 
 
+
     [Fact(DisplayName = "Deve retornar todos os usuários cadastrados")]
     public async Task ObterUsuarios_DeveRetornarTodosOsUsuarios()
     {
@@ -120,15 +123,35 @@ public sealed class UsuariosControllerTests : IDisposable
         // Act
         var response = await _client.GetAsync("/api/usuarios");
 
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-
         var resultado = await response.Content
-            .ReadFromJsonAsync<List<ObterUsuarioPorIdResultDto>>(_jsonOptions);
+            .ReadFromJsonAsync<PagedResult<ObterUsuariosResultDto>>(
+                new JsonSerializerOptions(JsonSerializerDefaults.Web));
+
+        // Assert
+        //response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var conteudo = await response.Content.ReadAsStringAsync();
+
+        Assert.True(
+            response.StatusCode == HttpStatusCode.OK,
+            $"Erro HTTP: {(int)response.StatusCode}\nDetalhes: {conteudo}");
 
         resultado.Should().NotBeNull();
-        resultado.Should().HaveCount(2);
+
+        resultado!.Items.Should().HaveCount(2);
+
+        resultado.Items.Should().Contain(u =>
+            u.Nome == "Daniel Modesto" &&
+            u.Email == "daniel@email.com");
+
+        resultado.Items.Should().Contain(u =>
+            u.Nome == "Maria Silva" &&
+            u.Email == "maria@email.com");
+
+        resultado.TotalCount.Should().Be(2);
+        resultado.TotalPages.Should().Be(1);
     }
+
 
 
 

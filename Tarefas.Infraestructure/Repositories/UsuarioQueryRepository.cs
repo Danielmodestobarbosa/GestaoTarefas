@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Common.Pagination;
 using Tarefas.Application.Queries.Usuarios.DTOs;
 using Tarefas.Infrastructure.Persistence;
 
@@ -33,17 +34,37 @@ public sealed class UsuarioQueryRepository : IUsuarioQueryRepository
             usuario.Email.Endereco,
             usuario.Status.ToString());
     }
-    public async Task<IReadOnlyList<ObterUsuariosResultDto>> ObterTodosAsync(
-    CancellationToken cancellationToken = default)
+    public async Task<PagedResult<ObterUsuariosResultDto>> ListarAsync(
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
     {
-        return await _context.Usuarios
-            .AsNoTracking()
+        // Garante valores válidos para a paginação.
+        pageNumber = Math.Max(pageNumber, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var query = _context.Usuarios
+            .AsNoTracking();
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderBy(usuario => usuario.Nome.Nome)
+            .ThenBy(usuario => usuario.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .Select(usuario => new ObterUsuariosResultDto(
                 usuario.Id,
                 usuario.Nome.Nome,
                 usuario.Email.Endereco,
                 usuario.Status.ToString()))
             .ToListAsync(cancellationToken);
+
+        return new PagedResult<ObterUsuariosResultDto>(
+            items,
+            pageNumber,
+            pageSize,
+            totalCount);
     }
 
 }

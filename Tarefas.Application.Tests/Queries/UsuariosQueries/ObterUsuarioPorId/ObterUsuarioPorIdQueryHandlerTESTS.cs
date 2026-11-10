@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Common.Pagination;
 using Tarefas.Application.Queries.Usuarios.DTOs;
 using Tarefas.Application.Queries.Usuarios.ObterUsuarioPorId;
 
@@ -55,6 +56,7 @@ public sealed class ObterUsuarioPorIdQueryHandlerTests
     }
 }
 
+
 internal sealed class FakeUsuarioQueryRepository : IUsuarioQueryRepository
 {
     private readonly ObterUsuarioPorIdResultDto? _usuario;
@@ -76,10 +78,18 @@ internal sealed class FakeUsuarioQueryRepository : IUsuarioQueryRepository
             _usuario?.Id == usuarioId ? _usuario : null);
     }
 
-    public Task<IReadOnlyList<ObterUsuariosResultDto>> ObterTodosAsync(
+    public Task<PagedResult<ObterUsuariosResultDto>> ListarAsync(
+        int pageNumber,
+        int pageSize,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<IReadOnlyList<ObterUsuariosResultDto>>(
-            Array.Empty<ObterUsuariosResultDto>());
+        var resultado = new PagedResult<ObterUsuariosResultDto>(
+            [],
+            pageNumber,
+            pageSize,
+            0);
+
+        return Task.FromResult(resultado);
     }
 }
+

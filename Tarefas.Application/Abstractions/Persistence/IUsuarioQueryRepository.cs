@@ -1,4 +1,5 @@
-﻿using Tarefas.Application.Queries.Usuarios.DTOs;
+﻿using Tarefas.Application.Common.Pagination;
+using Tarefas.Application.Queries.Usuarios.DTOs;
 
 namespace Tarefas.Application.Abstractions.Persistence;
 
@@ -8,6 +9,8 @@ public interface IUsuarioQueryRepository
         Guid usuarioId,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ObterUsuariosResultDto>> ObterTodosAsync(
+    Task<PagedResult<ObterUsuariosResultDto>> ListarAsync(
+        int pageNumber,
+        int pageSize,
         CancellationToken cancellationToken = default);
 }
