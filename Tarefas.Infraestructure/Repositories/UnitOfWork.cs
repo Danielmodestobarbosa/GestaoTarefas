@@ -17,7 +17,7 @@ public sealed class UnitOfWork : IUnitOfWork
         _context = context;
     }
 
-    public async Task BeginnTransactionAsync(
+    public async Task BeginTransactionAsync(
         CancellationToken cancellationToken = default)
     {
         if (_transaction is not null)

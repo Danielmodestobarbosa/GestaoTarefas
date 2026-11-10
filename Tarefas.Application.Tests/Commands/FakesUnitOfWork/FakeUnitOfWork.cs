@@ -5,6 +5,8 @@ namespace Tarefas.Application.Tests.Commands.FakesUnitOfWork;
 internal sealed class FakeUnitOfWork : IUnitOfWork
 {
     public int QuantidadeDeCommits { get; private set; }
+    public int QuantidadeDeTransacoesIniciadas { get; private set; }
+    public int QuantidadeDeRollBacks { get; private set; }
 
     public CancellationToken UltimoTokenCommit { get; private set; }
 
@@ -21,5 +23,19 @@ internal sealed class FakeUnitOfWork : IUnitOfWork
             throw ExcecaoAoCommit;
 
         return Task.FromResult(1);
+    }
+
+    public Task BeginTransactionAsync(
+        CancellationToken cancellationToken = default)
+    {
+        QuantidadeDeTransacoesIniciadas++;
+        return Task.CompletedTask;  
+    }
+
+    public Task RollBackAsync(
+        CancellationToken cancellationToken = default)
+    {
+        QuantidadeDeRollBacks++;
+        return Task.CompletedTask;
     }
 }

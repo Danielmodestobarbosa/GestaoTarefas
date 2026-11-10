@@ -3,7 +3,7 @@
 public interface IUnitOfWork
 {
     //Inicia uma transação no banco 
-    Task BeginTransationAsync(
+    Task BeginTransactionAsync(
         CancellationToken cancellationToken = default);
 
     //Salva as alterações e confirma a transação.
