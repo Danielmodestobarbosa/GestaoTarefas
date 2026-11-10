@@ -15,6 +15,7 @@ using Tarefas.Application.Commands.TarefaCommands.ConcluirTarefa;
 using Tarefas.Application.Commands.TarefaCommands.CriarTarefa;
 using Tarefas.Application.Commands.TarefaCommands.IniciarTarefa;
 using Tarefas.Application.Commands.UsuarioCommands.CriarUsuario;
+using Tarefas.Application.Common.Pagination;
 using Tarefas.Application.Queries.Tarefas.DTOs;
 using Tarefas.Domain.Tarefas.Enums;
 using Xunit;
@@ -159,22 +160,26 @@ public sealed class TarefasControllerTests
         var response = await _client.GetAsync("/api/tarefas");
 
         var resultado = await response.Content
-            .ReadFromJsonAsync<List<TarefaResumoDto>>(
+            .ReadFromJsonAsync<PagedResult<TarefaResumoDto>>(
                 new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         resultado.Should().NotBeNull();
-        resultado.Should().HaveCount(2);
 
-        resultado.Should().Contain(t =>
+        resultado!.Items.Should().HaveCount(2);
+
+        resultado.Items.Should().Contain(t =>
             t.Titulo == "Estudar C#" &&
             t.Status == StatusTarefa.Pendente.ToString());
 
-        resultado.Should().Contain(t =>
+        resultado.Items.Should().Contain(t =>
             t.Titulo == "Estudar DDD" &&
             t.Status == StatusTarefa.Pendente.ToString());
+
+        resultado.TotalCount.Should().Be(2);
+        resultado.TotalPages.Should().Be(1);
     }
 
 

@@ -1,4 +1,5 @@
-﻿using Tarefas.Application.Queries.Tarefas.DTOs;
+﻿using Tarefas.Application.Common.Pagination;
+using Tarefas.Application.Queries.Tarefas.DTOs;
 
 namespace Tarefas.Application.Abstractions.Persistence;
 
@@ -8,7 +9,9 @@ public interface ITarefaQueryRepository
         Guid tarefaId,
         CancellationToken ct = default);
 
-    Task<IReadOnlyList<TarefaResumoDto>> ListarAsync(
+    Task<PagedResult<TarefaResumoDto>> ListarAsync(
+        int pageNumber,
+        int pageSize,
         CancellationToken ct = default);
 }
 

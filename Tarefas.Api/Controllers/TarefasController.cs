@@ -24,11 +24,15 @@ public class TarefasController : ControllerBase
     }
 
     [HttpGet]
-    [EndpointSummary("Obtém todas as tarefas cadastradas no sistema.")]
+    [EndpointSummary("Obtém as tarefas cadastradas no sistema com paginação.")]
     public async Task<IActionResult> ListarTarefas(
-    CancellationToken cancellationToken)
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10,
+    CancellationToken cancellationToken = default)
     {
-        var query = new ListarTarefasQuery();
+        var query = new ListarTarefasQuery(
+            pageNumber,
+            pageSize);
 
         var response = await _mediator.Send(query, cancellationToken);
 

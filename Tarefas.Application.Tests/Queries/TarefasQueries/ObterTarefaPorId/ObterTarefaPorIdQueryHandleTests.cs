@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Common.Pagination;
 using Tarefas.Application.Queries.Tarefas.DTOs;
 using Tarefas.Application.Queries.Tarefas.ObterTarefaPorIdQuery;
 
@@ -92,7 +93,9 @@ internal sealed class FakeTarefaQueryRepository : ITarefaQueryRepository
         return Task.FromResult(_tarefa);
     }
 
-    public Task<IReadOnlyList<TarefaResumoDto>> ListarAsync(
+    public Task<PagedResult<TarefaResumoDto>> ListarAsync(
+        int pageNumber,
+        int pageSize,
         CancellationToken ct = default)
     {
         throw new NotImplementedException();
