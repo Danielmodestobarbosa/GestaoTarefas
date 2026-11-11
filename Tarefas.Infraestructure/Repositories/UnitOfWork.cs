@@ -7,7 +7,7 @@ using Tarefas.Infrastructure.Persistence;
 
 namespace Tarefas.Infrastructure.Repositories;
 
-public sealed class UnitOfWork : IUnitOfWork
+public sealed class UnitOfWork : IUnitOfWork, IAsyncDisposable
 {
     private readonly TarefasDbContext _context;
     private IDbContextTransaction? _transaction;
@@ -24,43 +24,97 @@ public sealed class UnitOfWork : IUnitOfWork
             throw new InvalidOperationException(
                 "Já existe uma transação em andamento.");
 
+        if(_context.Database.CurrentTransaction is not null)
+        throw new InvalidOperationException(
+            "O DbContext já participa de uma transação.");
+
         _transaction = await _context.Database
             .BeginTransactionAsync(cancellationToken);
     }
 
     public async Task<int> CommitAsync(
-        CancellationToken cancellationToken = default)
+    CancellationToken cancellationToken = default)
     {
-        var result = await _context.SaveChangesAsync(
-            cancellationToken);
-
-        if(_transaction is not null)
+        if (_transaction is null)
         {
-            await _transaction.CommitAsync(cancellationToken);
-
-            await _transaction.DisposeAsync();
-            _transaction = null;
+            return await _context.SaveChangesAsync(
+                cancellationToken);
         }
 
-        return result;
+        var transaction = _transaction;
+
+        try
+        {
+            var result = await _context.SaveChangesAsync(
+                cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+
+            return result;
+        }
+        catch (Exception exception)
+        {
+            try
+            {
+                await transaction.RollbackAsync(
+                    CancellationToken.None);
+            }
+            catch (Exception rollbackException)
+            {
+                throw new AggregateException(
+                    "Falha ao confirmar a transação e também ao executar rollback.",
+                    exception,
+                    rollbackException);
+            }
+
+            throw;
+        }
+        finally
+        {
+            _transaction = null;
+
+            await transaction.DisposeAsync();
+        }
     }
 
     public async Task RollBackAsync(
-        CancellationToken cancellationToken = default)
+    CancellationToken cancellationToken = default)
     {
-        if (_transaction is null)
+        var transaction = _transaction;
+
+        if (transaction is null)
             return;
 
         try
         {
-            await _transaction.RollbackAsync(cancellationToken);
+            await transaction.RollbackAsync(cancellationToken);
         }
         finally
         {
-            await _transaction.DisposeAsync();
             _transaction = null;
-        }
 
+            await transaction.DisposeAsync();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        var transaction = _transaction;
+
+        if (transaction is null)
+            return;
+
+        try
+        {
+            await transaction.RollbackAsync(
+                CancellationToken.None);
+        }
+        finally
+        {
+            _transaction = null;
+
+            await transaction.DisposeAsync();
+        }
     }
 }
 

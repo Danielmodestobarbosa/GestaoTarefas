@@ -1,4 +1,5 @@
 
+using Microsoft.EntityFrameworkCore;
 using Tarefas.Api.Exceptions;
 using Tarefas.Infrastructure.Extensions;
 using Tarefas.Infrastructure.Persistence;
@@ -56,13 +57,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/openapi/v1.json", "Tarefas API v1"));
 
-    // Cria o banco e as tabelas caso ainda não existam.
+    // Aplica as migrations pendentes no banco.
     using var scope = app.Services.CreateScope();
 
     var db = scope.ServiceProvider
         .GetRequiredService<TarefasDbContext>();
 
-    db.Database.EnsureCreated();
+    db.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
