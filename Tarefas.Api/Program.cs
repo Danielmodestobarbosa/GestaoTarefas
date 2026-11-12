@@ -1,5 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Http.Resilience;
 using Tarefas.Api.Exceptions;
 using Tarefas.Infrastructure.Extensions;
 using Tarefas.Infrastructure.Persistence;
@@ -45,6 +46,8 @@ builder.Services.AddIntegrations();
 //ExceptionHandler
 builder.Services.AddExceptionHandler<TarefasExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+builder.Services.AddHttpResilience();
 
 var app = builder.Build();
 

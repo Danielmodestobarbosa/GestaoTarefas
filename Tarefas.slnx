@@ -9,5 +9,6 @@
     <Project Path="Tarefas.Api.Tests/Tarefas.Api.Tests.csproj" Id="78e0816a-5f44-4209-84e2-04d7bb9281ef" />
     <Project Path="Tarefas.Application.Tests/Tarefas.Application.Tests.csproj" Id="8e7fc108-70fc-47a2-b1bc-4b7c7d131745" />
     <Project Path="Tarefas.Domain.Tests/Tarefas.Domain.Tests.csproj" />
+    <Project Path="Tarefas.Infrastructure.Tests/Tarefas.Infrastructure.Tests.csproj" Id="0a7b8f88-7658-4b4f-9087-a89d604099d4" />
   </Folder>
 </Solution>
