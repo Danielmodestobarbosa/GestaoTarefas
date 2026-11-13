@@ -11,6 +11,7 @@ public sealed class Usuario : AggregateRoot
 {
     public NomeUsuario Nome { get; private set; }
     public Email Email { get; private set; }
+    public string PasswordHash { get; private set; } 
     public StatusUsuario Status { get; private set; }
 
     // Construtor utilizado pelo Entity Framework Core.
@@ -18,6 +19,7 @@ public sealed class Usuario : AggregateRoot
     {
         Nome = null!;
         Email = null!;
+        PasswordHash = null!;
     }
 
     public Usuario(
@@ -34,6 +36,21 @@ public sealed class Usuario : AggregateRoot
             UsuarioId: Id,
             Nome: Nome.Nome,
             Email: Email.Endereco));
+    }
+
+    public void DefinirSenha (string passwordHash)
+    {
+        Guard.Against<DomainException>(
+            Status == StatusUsuario.Inativo,
+            "Usuários inativos não podem ter a senha definida");
+
+        Guard.Against<DomainException>(
+            string.IsNullOrWhiteSpace(passwordHash),
+            "O hash da senha não pode ser nulo ou vazio");
+
+        PasswordHash = passwordHash;
+
+        SetDataAtualizacao();
     }
 
     public void AtualizarPerfil(
