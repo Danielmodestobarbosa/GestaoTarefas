@@ -103,8 +103,9 @@ namespace Tarefas.Infrastructure.Tests.Extensions
                 options.AttemptTimeout.Timeout =
                     TimeSpan.FromMilliseconds(100);
 
-                options.Retry.DisableForUnsafeHttpMethods();
                 options.Retry.MaxRetryAttempts = 1;
+
+                options.Retry.DisableFor(HttpMethod.Get);
             });
 
             services.Configure<HttpClientFactoryOptions>(
