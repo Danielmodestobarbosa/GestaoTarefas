@@ -41,6 +41,10 @@ public sealed class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .HasMaxLength(50)
             .IsRequired();
 
+        builder.Property(u => u.PasswordHash)
+            .HasMaxLength(500)
+            .IsRequired();
+
         builder.Property(u => u.DataCriacao)
             .IsRequired();
 

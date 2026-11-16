@@ -455,7 +455,8 @@ public sealed class TarefasControllerTests
         // Arrange - Criar usuário
         var usuarioRequest = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "danielmodestop@hotmail.com");
+            "danielmodestop@hotmail.com",
+            "Senha@123");
 
         var usuarioResponse = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -490,7 +491,8 @@ public sealed class TarefasControllerTests
         // Arrange
         var usuarioRequest = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var usuarioResponse = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -560,7 +562,8 @@ public sealed class TarefasControllerTests
         // Arrange - Criar usuário
         var usuarioRequest = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var usuarioResponse = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -613,7 +616,8 @@ public sealed class TarefasControllerTests
         // Arrange - Criar usuário
         var usuarioRequest = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var usuarioResponse = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -659,7 +663,8 @@ public sealed class TarefasControllerTests
         // Arrange - Criar usuário
         var usuarioRequest = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var usuarioResponse = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -705,7 +710,8 @@ public sealed class TarefasControllerTests
         // Arrange - Criar usuário
         var usuarioRequest = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var usuarioResponse = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -752,7 +758,8 @@ public sealed class TarefasControllerTests
         // Arrange - Criar usuário
         var usuarioRequest = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com", 
+            "Senha@123");
 
         var usuarioResponse = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -812,7 +819,8 @@ public sealed class TarefasControllerTests
         // Arrange - Criar primeiro usuário
         var primeiroUsuarioRequest = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var primeiroUsuarioResponse = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -824,7 +832,8 @@ public sealed class TarefasControllerTests
         // Arrange - Criar segundo usuário
         var segundoUsuarioRequest = new CriarUsuarioRequest(
             "Maria Silva",
-            "maria@email.com");
+            "maria@email.com",
+            "Senha@123");
 
         var segundoUsuarioResponse = await _client.PostAsJsonAsync(
             "/api/usuarios",

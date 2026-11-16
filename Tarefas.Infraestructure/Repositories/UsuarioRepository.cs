@@ -24,6 +24,15 @@ public sealed class UsuarioRepository : IUsuarioRepository
                 u => u.Id == usuarioId,
                 cancellationToken);
     }
+    public async Task<Usuario?> ObterUsuarioPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Usuarios
+            .FirstOrDefaultAsync(
+                u => u.Email.Endereco == email,
+                cancellationToken);
+    }
 
     public async Task AdicionarAsync(
         Usuario usuario,
@@ -31,4 +40,6 @@ public sealed class UsuarioRepository : IUsuarioRepository
     {
         await _context.Usuarios.AddAsync(usuario, cancellationToken);
     }
+
+
 }

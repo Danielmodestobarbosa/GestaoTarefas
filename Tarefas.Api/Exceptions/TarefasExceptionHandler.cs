@@ -21,13 +21,17 @@ public sealed class TarefasExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
+
         var (status, titulo) = exception switch
         {
-            ValidationException=>
+            ValidationException =>
                 (400, "Erro de validação"),
 
             NotFoundException =>
                 (404, "Recurso não encontrado"),
+
+            UnauthorizedAccessException =>
+                (401, "Não autorizado"),
 
             DomainException =>
                 (422, "Regra de negócio violada"),
@@ -61,7 +65,9 @@ public sealed class TarefasExceptionHandler : IExceptionHandler
         {
             Status = status,
             Title = titulo,
-            Detail = exception.Message,
+            Detail = status == 500
+                ? "Ocorreu um erro interno no servidor."
+                : exception.Message,
             Instance = httpContext.Request.Path
         };
 

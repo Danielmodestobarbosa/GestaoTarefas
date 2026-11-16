@@ -1,9 +1,9 @@
 ﻿
 using FluentAssertions;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Abstractions.Security;
 using Tarefas.Application.Commands.UsuarioCommands.CriarUsuario;
 using Tarefas.Application.Tests.Commands.FakesUnitOfWork;
-using Tarefas.Domain.Tarefas.Entities;
 using Tarefas.Domain.Usuarios.Entities;
 using Tarefas.Domain.Usuarios.Enums;
 using Tarefas.Domain.Usuarios.ValueObjects;
@@ -20,15 +20,18 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Arrange
         var nome = new NomeUsuario("Daniel Modesto");
         var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
 
-        var command = new CriarUsuarioCommand(nome, email);
+        var command = new CriarUsuarioCommand(nome, email, senha);
 
         var repositorio = new FakeUsuarioRepository();
         var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
 
         var handler = new CriarUsuarioCommandHandler(
             repositorio,
-            unitOfWork);
+            unitOfWork,
+            passwordHasher);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -44,8 +47,46 @@ public sealed class CriarUsuarioCommandHandlerTests
         repositorio.UsuarioAdicionado!.Id.Should().Be(resultado.UsuarioId);
         repositorio.QuantidadeDeAdicoes.Should().Be(1);
         unitOfWork.QuantidadeDeCommits.Should().Be(1);
+
+        passwordHasher.UltimaSenhaRecebida.Should().Be(senha);
+
+        repositorio.UsuarioAdicionado!.PasswordHash
+            .Should().Be(passwordHasher.HashGerado);
+
+        repositorio.UsuarioAdicionado.PasswordHash
+            .Should().NotBe(senha);
     }
 
+    [Fact(DisplayName = "Deve utilizar a senha recebida no comando para gerar o hash")]
+    public async Task HandleAsync_DeveUtilizarSenhaDoCommandParaGerarHash()
+    {
+        // Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
+
+        var command = new CriarUsuarioCommand(nome, email, senha);
+
+        var repositorio = new FakeUsuarioRepository();
+        var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
+
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork,
+            passwordHasher);
+
+        // Act
+        await handler.Handle(command);
+
+        // Assert
+        passwordHasher.UltimaSenhaRecebida.Should().Be(senha);
+        repositorio.UsuarioAdicionado!.PasswordHash
+            .Should().Be(passwordHasher.HashGerado);
+
+        repositorio.UsuarioAdicionado.PasswordHash
+            .Should().NotBe(senha);
+    }
 
     [Fact(DisplayName = "Deve adicionar o usuário apenas uma vez")]
     public async Task HandleAsync_DeveAdicionarUsuarioApenasUmaVez()
@@ -53,15 +94,18 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Arrange
         var nome = new NomeUsuario("Daniel Modesto");
         var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
 
-        var command = new CriarUsuarioCommand(nome, email);
+        var command = new CriarUsuarioCommand(nome, email, senha);
 
         var repositorio = new FakeUsuarioRepository();
         var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
 
         var handler = new CriarUsuarioCommandHandler(
             repositorio,
-            unitOfWork);
+            unitOfWork,
+            passwordHasher);
 
         // Act
         await handler.Handle(command);
@@ -78,18 +122,21 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Arrange
         var nome = new NomeUsuario("Daniel Modesto");
         var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
 
-        var command = new CriarUsuarioCommand(nome, email);
+        var command = new CriarUsuarioCommand(nome, email, senha);
 
         using var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         var repositorio = new FakeUsuarioRepository();
         var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
 
         var handler = new CriarUsuarioCommandHandler(
             repositorio,
-            unitOfWork);
+            unitOfWork,
+            passwordHasher);
 
         // Act
         await handler.Handle(command, cancellationToken);
@@ -105,15 +152,18 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Arrange
         var nome = new NomeUsuario("Daniel Modesto");
         var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
 
-        var command = new CriarUsuarioCommand(nome, email);
+        var command = new CriarUsuarioCommand(nome, email, senha);
 
         var repositorio = new FakeUsuarioRepository();
         var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
 
         var handler = new CriarUsuarioCommandHandler(
             repositorio,
-            unitOfWork);
+            unitOfWork,
+            passwordHasher);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -134,8 +184,9 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Arrange
         var nome = new NomeUsuario("Daniel Modesto");
         var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
 
-        var command = new CriarUsuarioCommand(nome, email);
+        var command = new CriarUsuarioCommand(nome, email, senha);
 
         var repositorio = new FakeUsuarioRepository
         {
@@ -143,9 +194,11 @@ public sealed class CriarUsuarioCommandHandlerTests
         };
 
         var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
         var handler = new CriarUsuarioCommandHandler(
             repositorio,
-            unitOfWork);
+            unitOfWork,
+            passwordHasher);
 
         // Act
         var acao = async () => await handler.Handle(command);
@@ -166,15 +219,18 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Arrange
         var nome = new NomeUsuario("Daniel Modesto");
         var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
 
-        var command = new CriarUsuarioCommand(nome, email);
+        var command = new CriarUsuarioCommand(nome, email, senha);
 
         var repositorio = new FakeUsuarioRepository();
         var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
 
         var handler = new CriarUsuarioCommandHandler(
             repositorio,
-            unitOfWork);
+            unitOfWork,
+            passwordHasher);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -195,15 +251,18 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Arrange
         var nome = new NomeUsuario("Daniel Modesto");
         var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
 
-        var command = new CriarUsuarioCommand(nome, email);
+        var command = new CriarUsuarioCommand(nome, email, senha);
 
         var repositorio = new FakeUsuarioRepository();
         var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
 
         var handler = new CriarUsuarioCommandHandler(
             repositorio,
-            unitOfWork);
+            unitOfWork,
+            passwordHasher);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -221,15 +280,18 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Arrange
         var nome = new NomeUsuario("Daniel Modesto");
         var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
 
-        var command = new CriarUsuarioCommand(nome, email);
+        var command = new CriarUsuarioCommand(nome, email, senha);
 
         var repositorio = new FakeUsuarioRepository();
         var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
 
         var handler = new CriarUsuarioCommandHandler(
             repositorio,
-            unitOfWork);
+            unitOfWork,
+            passwordHasher);
 
         // Act
         var resultado = await handler.Handle(command);
@@ -247,8 +309,9 @@ public sealed class CriarUsuarioCommandHandlerTests
         // Arrange
         var nome = new NomeUsuario("Daniel Modesto");
         var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
 
-        var command = new CriarUsuarioCommand(nome, email);
+        var command = new CriarUsuarioCommand(nome, email, senha);
 
         var repositorio = new FakeUsuarioRepository
         {
@@ -256,9 +319,11 @@ public sealed class CriarUsuarioCommandHandlerTests
         };
 
         var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
         var handler = new CriarUsuarioCommandHandler(
             repositorio,
-            unitOfWork);
+            unitOfWork,
+            passwordHasher);
 
         // Act
         var acao = async () => await handler.Handle(command);
@@ -270,9 +335,44 @@ public sealed class CriarUsuarioCommandHandlerTests
         unitOfWork.QuantidadeDeCommits.Should().Be(0);
     }
 
+    [Fact(DisplayName = "Deve gerar hash antes de adicionar usuário")]
+    public async Task HandleAsync_DeveGerarHashAntesDeAdicionarUsuario()
+    {
+        // Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+        const string senha = "Senha@123";
+
+        var command = new CriarUsuarioCommand(nome, email, senha);
+
+        var repositorio = new FakeUsuarioRepository();
+        var unitOfWork = new FakeUnitOfWork();
+        var passwordHasher = new FakePasswordHasher();
+
+        var handler = new CriarUsuarioCommandHandler(
+            repositorio,
+            unitOfWork,
+            passwordHasher);
+
+        // Act
+        await handler.Handle(command);
+
+        // Assert
+        passwordHasher.UltimaSenhaRecebida.Should().Be(senha);
+
+        repositorio.UsuarioAdicionado.Should().NotBeNull();
+
+        repositorio.UsuarioAdicionado!.PasswordHash
+            .Should().Be(passwordHasher.HashGerado);
+
+        repositorio.QuantidadeDeAdicoes.Should().Be(1);
+        unitOfWork.QuantidadeDeCommits.Should().Be(1);
+    }
+
 
     #endregion
 }
+
 
 internal sealed class FakeUsuarioRepository : IUsuarioRepository
 {
@@ -292,7 +392,9 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
 
     public Guid UltimoIdConsultado { get; private set; }
 
-    public FakeUsuarioRepository(Usuario? usuario  = null)
+    public string? UltimoEmailConsultado { get; private set; }
+
+    public FakeUsuarioRepository(Usuario? usuario = null)
     {
         _usuario = usuario;
     }
@@ -305,13 +407,26 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
         UltimoIdConsultado = usuarioId;
 
         if (DeveFalharAoConsultar)
-        {
             throw new InvalidOperationException(
                 "Falha simulada ao consultar usuário");
-        }
 
         return Task.FromResult<Usuario?>(
             _usuario?.Id == usuarioId ? _usuario : null);
+    }
+
+    public Task<Usuario?> ObterUsuarioPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default)
+    {
+        UltimoTokenConsulta = cancellationToken;
+        UltimoEmailConsultado = email;
+
+        if (DeveFalharAoConsultar)
+            throw new InvalidOperationException(
+                "Falha simulada ao consultar usuário");
+
+        return Task.FromResult<Usuario?>(
+            _usuario?.Email.Endereco == email ? _usuario : null);
     }
 
     public Task AdicionarAsync(
@@ -324,12 +439,48 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
         UsuarioAdicionado = usuario;
 
         if (DeveFalharAoAdicionar)
-        {
             throw new InvalidOperationException(
                 "Falha simulada ao adicionar usuário");
-        }
 
         return Task.CompletedTask;
     }
 }
+
+
+
+internal sealed class FakePasswordHasher : IPasswordHasher
+{
+    public string? UltimaSenhaRecebida { get; private set; }
+
+    public string? UltimoHashVerificado { get; private set; }
+
+    public string? UltimaSenhaVerificada { get; private set; }
+
+    public string HashGerado { get; set; } = "hash-gerado";
+
+    public string SenhaCorreta { get; set; } = string.Empty;
+
+    public int QuantidadeDeVerificacoes { get; private set; }
+
+    public string HashPassword(string password)
+    {
+        UltimaSenhaRecebida = password;
+        return HashGerado;
+    }
+
+    public bool VerifyPassword(
+        string hashedPassword,
+        string providedPassword)
+    {
+        QuantidadeDeVerificacoes++;
+
+        UltimoHashVerificado = hashedPassword;
+        UltimaSenhaVerificada = providedPassword;
+
+        return hashedPassword == HashGerado &&
+               providedPassword == SenhaCorreta;
+    }
+}
+
+
 

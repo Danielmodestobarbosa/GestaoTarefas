@@ -440,4 +440,85 @@ public class UsuarioTests
     }
 
     #endregion
+
+    #region Testes de Definir Senha
+
+    [Fact(DisplayName = "Deve definir o hash da senha do usuário ")]
+    public void Deve_Definir_Hash_Da_Senha_Do_Usuario()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+        var passwordHash = "hash_da_senha";
+
+        //Act
+        usuario.DefinirSenha(passwordHash);
+
+        //Assert
+        usuario.PasswordHash.Should().Be(passwordHash);
+
+    }
+
+    [Fact(DisplayName = "Deve atualizar DataAtualizacao ao definir senha")]
+    public void Deve_Atualizar_DataAtualizacao_Ao_Definir_Senha()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+
+        var usuario = new Usuario(nome, email);
+        var passwordHash = "hash_da_senha";
+
+        //Act
+        usuario.DefinirSenha(passwordHash);
+
+        //Assert
+        usuario.DataAtualizacao.Should().NotBeNull();
+
+    }
+
+    [Theory(DisplayName = "Não deve definir senha com hash inválido")]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("     ")]
+    public void Nao_Deve_Definir_Senha_Com_Hash_Invalido(string? passwordHash)
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+        var usuario = new Usuario(nome, email);
+
+        //Act
+        var acao = () => usuario.DefinirSenha(passwordHash!);
+
+        //Assert
+        acao.Should()
+            .Throw<DomainException>()
+            .WithMessage("O hash da senha não pode ser nulo ou vazio");
+
+    }
+
+    [Fact(DisplayName = "Não deve definir senha para usuário inativo")]
+    public void Nao_Deve_Definir_Senha_Para_Usuario_Inativo()
+    {
+        //Arrange
+        var nome = new NomeUsuario("Daniel Modesto");
+        var email = new Email("daniel@hotmail.com");
+        var usuario = new Usuario(nome, email);
+
+        usuario.DesativarPerfil();
+
+        //Act
+        var acao = () => usuario.DefinirSenha("hash_da_senha");
+
+        //Assert
+        acao.Should()
+            .Throw<DomainException>()
+            .WithMessage("Usuários inativos não podem ter a senha definida");
+    }
+
+    #endregion
+
 }

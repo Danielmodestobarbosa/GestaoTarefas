@@ -250,7 +250,8 @@ public sealed class AtualizarUsuarioCommandHandlerTestes
     #endregion
 }
 
-internal class FakeUsuarioRepository : IUsuarioRepository
+
+internal sealed class FakeUsuarioRepository : IUsuarioRepository
 {
     private readonly Usuario _usuario;
 
@@ -259,6 +260,8 @@ internal class FakeUsuarioRepository : IUsuarioRepository
     public CancellationToken UltimoTokenConsulta { get; private set; }
 
     public Guid UltimoIdConsultado { get; private set; }
+
+    public string? UltimoEmailConsultado { get; private set; }
 
     public FakeUsuarioRepository(Usuario usuario)
     {
@@ -270,17 +273,29 @@ internal class FakeUsuarioRepository : IUsuarioRepository
         CancellationToken cancellationToken = default)
     {
         UltimoTokenConsulta = cancellationToken;
-
         UltimoIdConsultado = usuarioId;
 
         if (DeveFalharAoConsultar)
-        {
             throw new InvalidOperationException(
                 "Falha simulada ao consultar usuário");
-        }
 
         return Task.FromResult<Usuario?>(
             usuarioId == _usuario.Id ? _usuario : null);
+    }
+
+    public Task<Usuario?> ObterUsuarioPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default)
+    {
+        UltimoTokenConsulta = cancellationToken;
+        UltimoEmailConsultado = email;
+
+        if (DeveFalharAoConsultar)
+            throw new InvalidOperationException(
+                "Falha simulada ao consultar usuário");
+
+        return Task.FromResult<Usuario?>(
+            email == _usuario.Email.Endereco ? _usuario : null);
     }
 
     public Task AdicionarAsync(
@@ -290,4 +305,5 @@ internal class FakeUsuarioRepository : IUsuarioRepository
         throw new NotImplementedException();
     }
 }
+
 

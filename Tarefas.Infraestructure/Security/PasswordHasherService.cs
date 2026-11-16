@@ -17,6 +17,7 @@ public sealed class PasswordHasherService : IPasswordHasher
             password);
     }
 
+
     public bool VerifyPassword(
         string passwordHash,
         string providedPassword)
@@ -27,12 +28,21 @@ public sealed class PasswordHasherService : IPasswordHasher
             return false;
         }
 
-        var result = _passwordHasher.VerifyHashedPassword(
-            new object(),
-            passwordHash,
-            providedPassword);
+        try
+        {
+            var result = _passwordHasher.VerifyHashedPassword(
+                new object(),
+                passwordHash,
+                providedPassword);
 
-        return result != PasswordVerificationResult.Failed;
+            return result != PasswordVerificationResult.Failed;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
     }
+
 }
+
 

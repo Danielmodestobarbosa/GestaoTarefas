@@ -42,6 +42,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddIntegrations();
+builder.Services.AddSecurity();
 
 //ExceptionHandler
 builder.Services.AddExceptionHandler<TarefasExceptionHandler>();

@@ -8,6 +8,10 @@ public interface IUsuarioRepository
         Guid usuarioId, 
         CancellationToken cancellationToken = default);
 
+    Task<Usuario?> ObterUsuarioPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default);
+
     Task AdicionarAsync(
         Usuario usuario, 
         CancellationToken cancellationToken = default);

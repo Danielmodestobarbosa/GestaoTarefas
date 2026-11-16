@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tarefas.Api.Requests.Usuarios;
 using Tarefas.Application.Commands.UsuarioCommands.AtivarUsuario;
 using Tarefas.Application.Commands.UsuarioCommands.AtualizarUsuario;
+using Tarefas.Application.Commands.UsuarioCommands.AutenticarUsuario;
 using Tarefas.Application.Commands.UsuarioCommands.CriarUsuario;
 using Tarefas.Application.Commands.UsuarioCommands.DesativarUsuario;
 using Tarefas.Application.Queries.Usuarios.ObterUsuarioExterno;
@@ -76,7 +77,8 @@ public class UsuariosController : ControllerBase
     {
         var command = new CriarUsuarioCommand(
             new NomeUsuario(request.Nome),
-            new Email(request.Email));
+            new Email(request.Email),
+            request.Senha);
 
         var response = await _mediator.Send(command, cancellationToken);
 
@@ -126,4 +128,20 @@ public class UsuariosController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("autenticar")]
+    [EndpointSummary("Autentica um usuário cadastrado no sistema.")]
+    public async Task<IActionResult> AutenticarUsuario(
+    [FromBody] AutenticarUsuarioRequest request,
+    CancellationToken cancellationToken)
+    {
+        var command = new AutenticarUsuarioCommand(
+            new Email(request.Email),
+            request.Senha);
+
+        var response = await _mediator.Send(
+            command,
+            cancellationToken);
+
+        return Ok(response);
+    }
 }

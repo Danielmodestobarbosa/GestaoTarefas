@@ -39,7 +39,8 @@ public sealed class UsuariosControllerTests : IDisposable
         // Arrange
         var request = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         // Act
         var response = await _client.PostAsJsonAsync(
@@ -66,7 +67,8 @@ public sealed class UsuariosControllerTests : IDisposable
         // Arrange
         var request = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var respostaCadastro = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -111,11 +113,13 @@ public sealed class UsuariosControllerTests : IDisposable
         // Arrange
         var usuario1 = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var usuario2 = new CriarUsuarioRequest(
             "Maria Silva",
-            "maria@email.com");
+            "maria@email.com",
+            "Senha@123");
 
         await _client.PostAsJsonAsync("/api/usuarios", usuario1);
         await _client.PostAsJsonAsync("/api/usuarios", usuario2);
@@ -161,7 +165,8 @@ public sealed class UsuariosControllerTests : IDisposable
         // Arrange
         var cadastro = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var respostaCadastro = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -222,7 +227,8 @@ public sealed class UsuariosControllerTests : IDisposable
         // Arrange
         var cadastro = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com",
+            "Senha@123");
 
         var respostaCadastro = await _client.PostAsJsonAsync(
             "/api/usuarios",
@@ -270,7 +276,8 @@ public sealed class UsuariosControllerTests : IDisposable
         // Arrange
         var cadastro = new CriarUsuarioRequest(
             "Daniel Modesto",
-            "daniel@email.com");
+            "daniel@email.com", 
+            "Senha@123");
 
         var respostaCadastro = await _client.PostAsJsonAsync(
             "/api/usuarios",

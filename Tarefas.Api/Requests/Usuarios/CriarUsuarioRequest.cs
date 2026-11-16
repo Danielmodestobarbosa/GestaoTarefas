@@ -2,4 +2,5 @@
 
 public sealed record CriarUsuarioRequest(
     string Nome,
-    string Email);
+    string Email,
+    string Senha);

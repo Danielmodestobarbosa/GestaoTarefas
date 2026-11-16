@@ -347,11 +347,16 @@ internal sealed class FakeTarefaCommandRepository : ITarefaRepository
 }
 
 
+
 internal sealed class FakeUsuarioRepository : IUsuarioRepository
 {
     private readonly Usuario _usuario;
 
     public CancellationToken UltimoTokenConsulta { get; private set; }
+
+    public string? UltimoEmailConsultado { get; private set; }
+
+    public Guid UltimoIdConsultado { get; private set; }
 
     public FakeUsuarioRepository(Usuario usuario)
     {
@@ -363,9 +368,21 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
         CancellationToken cancellationToken = default)
     {
         UltimoTokenConsulta = cancellationToken;
+        UltimoIdConsultado = usuarioId;
 
-        return Task.FromResult(
+        return Task.FromResult<Usuario?>(
             _usuario.Id == usuarioId ? _usuario : null);
+    }
+
+    public Task<Usuario?> ObterUsuarioPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default)
+    {
+        UltimoTokenConsulta = cancellationToken;
+        UltimoEmailConsultado = email;
+
+        return Task.FromResult<Usuario?>(
+            _usuario.Email.Endereco == email ? _usuario : null);
     }
 
     public Task AdicionarAsync(

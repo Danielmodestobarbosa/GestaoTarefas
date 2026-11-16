@@ -281,16 +281,18 @@ public sealed class DesativarUsuarioCommandHandlerTests
 
     #endregion
 }
+
 internal sealed class FakeUsuarioRepository : IUsuarioRepository
 {
-    private readonly Usuario _usuario;
+    private readonly Usuario? _usuario;
 
     public bool DeveFalharAoConsultar { get; set; }
 
     public CancellationToken UltimoTokenConsulta { get; private set; }
 
     public Guid UltimoIdConsultado { get; private set; }
-    public Usuario? UsuarioAtualizado { get; private set; }
+
+    public string? UltimoEmailConsultado { get; private set; }
 
     public FakeUsuarioRepository(Usuario? usuario = null)
     {
@@ -310,6 +312,21 @@ internal sealed class FakeUsuarioRepository : IUsuarioRepository
 
         return Task.FromResult<Usuario?>(
             _usuario?.Id == usuarioId ? _usuario : null);
+    }
+
+    public Task<Usuario?> ObterUsuarioPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default)
+    {
+        UltimoEmailConsultado = email;
+        UltimoTokenConsulta = cancellationToken;
+
+        if (DeveFalharAoConsultar)
+            throw new InvalidOperationException(
+                "Falha simulada ao consultar usuário");
+
+        return Task.FromResult<Usuario?>(
+            _usuario?.Email.Endereco == email ? _usuario : null);
     }
 
     public Task AdicionarAsync(
