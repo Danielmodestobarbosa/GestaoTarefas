@@ -13,6 +13,7 @@ public sealed class Usuario : AggregateRoot
     public Email Email { get; private set; }
     public string PasswordHash { get; private set; } 
     public StatusUsuario Status { get; private set; }
+    public PerfilUsuario Perfil { get; private set; }
 
     // Construtor utilizado pelo Entity Framework Core.
     private Usuario()
@@ -31,6 +32,7 @@ public sealed class Usuario : AggregateRoot
         Nome = nome;
         Email = email;
         Status = StatusUsuario.Ativo;
+        Perfil = PerfilUsuario.User;
 
         AddDomainEvent(new UsuarioCriadoEvent(
             UsuarioId: Id,

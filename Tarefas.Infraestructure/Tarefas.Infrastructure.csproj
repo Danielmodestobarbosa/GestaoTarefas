@@ -19,10 +19,11 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="10.1.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.14" />
 		<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="11.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.14" />
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
 	</ItemGroup>
 
 	<ItemGroup>

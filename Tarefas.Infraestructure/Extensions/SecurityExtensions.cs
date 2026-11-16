@@ -11,6 +11,7 @@ public static class SecurityExtensions
         this IServiceCollection services)
     {
         services.AddScoped<IPasswordHasher, PasswordHasherService>();
+        services.AddScoped<ITokenService, TokenService>();
 
         return services;
     }

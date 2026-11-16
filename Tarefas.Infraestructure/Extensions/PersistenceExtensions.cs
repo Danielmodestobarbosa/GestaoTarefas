@@ -3,11 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tarefas.Application.Abstractions.Persistence;
+using Tarefas.Application.Abstractions.Security;
 using Tarefas.Domain.Common.Interfaces;
 using Tarefas.Infrastructure.Event;
 using Tarefas.Infrastructure.Persistence;
 using Tarefas.Infrastructure.Persistence.Repositories;
 using Tarefas.Infrastructure.Repositories;
+using Tarefas.Infrastructure.Security;
 
 namespace Tarefas.Infrastructure.Extensions;
 
@@ -38,6 +40,7 @@ public static class PersistenceExtensions
         services.AddScoped<
             IDomainEventDispatcher,
             InMemoryDomainEventDispatcher>();
+
 
         return services;
     }

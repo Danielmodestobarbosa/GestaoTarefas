@@ -11,13 +11,16 @@ public sealed class AutenticarUsuarioCommandHandler
 {
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ITokenService _tokenService;
 
     public AutenticarUsuarioCommandHandler(
         IUsuarioRepository usuarioRepository,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        ITokenService tokenService)
     {
         _usuarioRepository = usuarioRepository;
         _passwordHasher = passwordHasher;
+        _tokenService = tokenService;
     }
 
     public async Task<AutenticarUsuarioResultDto> Handle(
@@ -41,9 +44,16 @@ public sealed class AutenticarUsuarioCommandHandler
         if (!senhaValida)
             throw new UnauthorizedAccessException("E-mail ou senha inválidos.");
 
+        var accessToken = _tokenService.GerarAccessToken(
+            usuario.Id,
+            usuario.Nome.Nome,
+            usuario.Email.Endereco,
+            usuario.Perfil);
+
         return new AutenticarUsuarioResultDto(
             usuario.Id,
             usuario.Nome,
-            usuario.Email);
+            usuario.Email,
+            accessToken);
     }
 }

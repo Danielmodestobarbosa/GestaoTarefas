@@ -1,9 +1,12 @@
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Http.Resilience;
 using Tarefas.Api.Exceptions;
 using Tarefas.Infrastructure.Extensions;
 using Tarefas.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,18 +53,48 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddHttpResilience();
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "Tarefas API",
+            Version = "v1"
+        });
+
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Informe o token JWT."
+        });
+
+        c.AddSecurityRequirement(document =>
+            new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+            });
+    });
+}
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
 
     app.UseSwaggerUI(c =>
-    c.SwaggerEndpoint("/openapi/v1.json", "Tarefas API v1"));
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tarefas API v1"));
 
-    // Aplica as migrations pendentes no banco.
+    // Aplica as migrations pendentes.
     using var scope = app.Services.CreateScope();
 
     var db = scope.ServiceProvider
@@ -71,6 +104,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Identifica o usuário através do JWT.
+app.UseAuthentication();
+
 app.UseAuthorization();
 app.MapControllers();
 
