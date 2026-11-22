@@ -52,8 +52,8 @@ public sealed class AutenticarUsuarioCommandHandler
 
         return new AutenticarUsuarioResultDto(
             usuario.Id,
-            usuario.Nome,
-            usuario.Email,
+            usuario.Nome.Nome,
+            usuario.Email.Endereco,
             accessToken);
     }
 }

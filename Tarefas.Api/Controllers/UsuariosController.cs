@@ -1,21 +1,28 @@
 ﻿
+
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 using Tarefas.Api.Requests.Usuarios;
+
 using Tarefas.Application.Commands.UsuarioCommands.AtivarUsuario;
 using Tarefas.Application.Commands.UsuarioCommands.AtualizarUsuario;
 using Tarefas.Application.Commands.UsuarioCommands.AutenticarUsuario;
 using Tarefas.Application.Commands.UsuarioCommands.CriarUsuario;
 using Tarefas.Application.Commands.UsuarioCommands.DesativarUsuario;
+
 using Tarefas.Application.Queries.Usuarios.ObterUsuarioExterno;
 using Tarefas.Application.Queries.Usuarios.ObterUsuarioPorId;
 using Tarefas.Application.Queries.Usuarios.ObterUsuarios;
+
 using Tarefas.Domain.Usuarios.ValueObjects;
 
 namespace Tarefas.Api.Controllers;
 
 [ApiController]
 [Route("api/usuarios")]
+[Authorize]
 public class UsuariosController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -28,8 +35,8 @@ public class UsuariosController : ControllerBase
     [HttpGet("{id:guid}")]
     [EndpointSummary("Obtém um usuário cadastrado pelo seu Id")]
     public async Task<IActionResult> ObterUsuarioPorId(
-    [FromRoute] Guid id,
-    CancellationToken cancellationToken)
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
     {
         var query = new ObterUsuarioPorIdQuery(id);
 
@@ -44,7 +51,7 @@ public class UsuariosController : ControllerBase
     [HttpGet]
     [EndpointSummary("Obtém todos os usuários cadastrados no sistema.")]
     public async Task<IActionResult> ObterUsuarios(
-    CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
         var query = new ObterUsuariosQuery();
 
@@ -56,8 +63,8 @@ public class UsuariosController : ControllerBase
     [HttpGet("externo/{usuarioId:int}")]
     [EndpointSummary("Consulta os dados de um usuário na API externa.")]
     public async Task<IActionResult> ObterUsuarioExterno(
-    [FromRoute] int usuarioId,
-    CancellationToken cancellationToken)
+        [FromRoute] int usuarioId,
+        CancellationToken cancellationToken)
     {
         var query = new ObterUsuarioExternoQuery(usuarioId);
 
@@ -71,6 +78,7 @@ public class UsuariosController : ControllerBase
 
     [HttpPost]
     [EndpointSummary("Cadastra um novo usuário no sistema.")]
+    [AllowAnonymous]
     public async Task<IActionResult> CriarUsuario(
         [FromBody] CriarUsuarioRequest request,
         CancellationToken cancellationToken)
@@ -117,6 +125,7 @@ public class UsuariosController : ControllerBase
 
     [HttpPatch("{id:guid}/desativar")]
     [EndpointSummary("Desativa um usuário ativo.")]
+    [AllowAnonymous]
     public async Task<IActionResult> DesativarUsuario(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
@@ -129,10 +138,11 @@ public class UsuariosController : ControllerBase
     }
 
     [HttpPost("autenticar")]
+    [AllowAnonymous]
     [EndpointSummary("Autentica um usuário cadastrado no sistema.")]
     public async Task<IActionResult> AutenticarUsuario(
-    [FromBody] AutenticarUsuarioRequest request,
-    CancellationToken cancellationToken)
+        [FromBody] AutenticarUsuarioRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new AutenticarUsuarioCommand(
             new Email(request.Email),
@@ -145,3 +155,4 @@ public class UsuariosController : ControllerBase
         return Ok(response);
     }
 }
+
